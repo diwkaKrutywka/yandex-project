@@ -1,13 +1,15 @@
 import type { AxiosRequestConfig, AxiosResponse, Method } from 'axios'
 import http from '../utils/https'
 
-export function SpecialtiesApi<T = any>(
+export function ScheduleApi<T = any>(
     url: string,
     data?: Record<string, any>,
     method: Method = 'POST'
   ): Promise<AxiosResponse<T>> {
+    console.log('🔧 ScheduleApi вызван:', { url, data, method });
+    
     const config: AxiosRequestConfig = {
-      url: `specialties${url}`,
+      url: `doctors${url}`,
       method,
     }
   
@@ -16,19 +18,24 @@ export function SpecialtiesApi<T = any>(
     } else if (method.toUpperCase() === 'GET') {
       config.params = data
     }
+    
+    console.log('🔧 ScheduleApi config:', config);
   
     return http(config)
   }
 
-// Типы для специальностей
-export interface Specialty {
+// Типы для врачей
+export interface Doctor {
   id: string;
-  name: string;
-  description?: string;
+  full_name: string;
+  specialty: string;
+  cabinet: string;
+  schedule_string: string;
+  type?: 'oms' | 'paid';
 }
 
-export interface SpecialtiesResponse {
-  specialties: Specialty[];
+export interface DoctorsResponse {
+  doctors: Doctor[];
+  specialityName?: string;
   total?: number;
 }
-  

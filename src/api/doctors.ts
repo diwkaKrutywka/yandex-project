@@ -1,13 +1,13 @@
 import type { AxiosRequestConfig, AxiosResponse, Method } from 'axios'
 import http from '../utils/https'
 
-export function SpecialtiesApi<T = any>(
+export function DoctorsApi<T = any>(
     url: string,
     data?: Record<string, any>,
     method: Method = 'POST'
   ): Promise<AxiosResponse<T>> {
     const config: AxiosRequestConfig = {
-      url: `specialties${url}`,
+      url: `doctors-teminal${url}`,
       method,
     }
   
@@ -20,15 +20,18 @@ export function SpecialtiesApi<T = any>(
     return http(config)
   }
 
-// Типы для специальностей
-export interface Specialty {
+// Типы для врачей
+export interface Doctor {
   id: string;
-  name: string;
-  description?: string;
+  full_name: string;
+  specialty: string;
+  cabinet: string;
+  schedule_string: string;
+  type?: 'oms' | 'paid';
 }
 
-export interface SpecialtiesResponse {
-  specialties: Specialty[];
+export interface DoctorsResponse {
+  doctors: Doctor[];
+  specialityName?: string;
   total?: number;
 }
-  

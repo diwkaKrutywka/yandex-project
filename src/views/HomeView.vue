@@ -33,7 +33,7 @@
           :class="{ 'hide-video': isAnimating }"
         >
           <div
-            class="w-[202px] h-[202px] sm:w-[186px] sm:h-[186px] lg:w-[250px] lg:h-[250px] xl:w-[274px] xl:h-[274px] rounded-full border-4 border-[#E8F4F2] overflow-hidden shadow-lg bg-white video-glow"
+            class="w-[202px] h-[202px] sm:w-[186px] sm:h-[186px] lg:w-[250px] lg:h-[250px] xl:w-[274px] xl:h-[274px] rounded-full overflow-hidden shadow-lg bg-white video-glow gradient-border"
           >
             <video
               src="../assets/idle.mp4"
@@ -256,9 +256,6 @@ const selectService = (service: string) => {
 /* Простая анимация возврата видео */
 .return-animation {
   animation: returnFromService 1.6s ease-out forwards;
-  /* Добавляем яркую границу для видимости */
-  border: 5px solid red !important;
-  background: yellow !important;
 }
 
 @keyframes returnFromService {
@@ -274,5 +271,22 @@ const selectService = (service: string) => {
     transform: translate(0, 0) scale(1) rotate(0deg);
     opacity: 1;
   }
+}
+
+/* Градиентный бордер */
+.gradient-border {
+  position: relative;
+}
+
+.gradient-border::before {
+  content: '';
+  position: absolute;
+  top: -4px;
+  left: -4px;
+  right: -4px;
+  bottom: -4px;
+  background: linear-gradient(45deg, #11AE78, #E8F4F2, #11AE78);
+  border-radius: 50%;
+  z-index: -1;
 }
 </style>

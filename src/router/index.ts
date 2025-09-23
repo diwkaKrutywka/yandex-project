@@ -20,16 +20,25 @@ const routes: RouteRecordRaw[] = [
     component: () => import("../views/HomeView.vue"),
   },
   {
+    path: "/auth-page",
+    name: "AuthPage",
+    component: () => import("../views/AuthPage.vue"),
+  },
+  {
     path: "/chat",
     name: "ChatView",
     component: () => import("../views/ChatView.vue"),
   },
   {
-    path: "/service",
-    name: "ServiceView",
-    component: () => import("../views/ServiceView.vue"),
-  },
-
+      path: "/service",
+      name: "ServiceView",
+      component: () => import("../views/ServiceView.vue"),
+    },
+    {
+      path: "/doctors",
+      name: "DoctorsPage",
+      component: () => import("../views/DoctorsPage.vue"),
+    },
 ];
 
 const router = createRouter({

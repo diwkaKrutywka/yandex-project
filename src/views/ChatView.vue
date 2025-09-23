@@ -77,8 +77,8 @@
 
       </div>
 
-      <!-- Быстрые кнопки (показываются только после первого сообщения бота) -->
-      <div v-if="showQuickReplies && messages.filter(m => m.isBot).length === 1" class="ml-0 mr-auto mb-3 max-w-[80%]">
+      <!-- Быстрые кнопки (показываются только для первого bot_text) -->
+      <div v-if="showQuickReplies" class="ml-0 mr-auto mb-3 max-w-[80%]">
         <div class="grid grid-cols-2 gap-2">
           <div
             v-for="(option, index) in quickReplyOptions"
@@ -300,6 +300,7 @@ const isTyping = ref(false);
 
 // Состояние для быстрых кнопок ответа
 const showQuickReplies = ref(false);
+const botTextCount = ref(0); // Простой счетчик bot_text сообщений
 const quickReplyOptions = [
   'Изменить запись',
   'Пройти чекап', 
@@ -493,12 +494,7 @@ const animateExistingBotMessages = async () => {
   console.log(`📝 Найдено ${botMessages.length} сообщений бота для анимации`);
   console.log('📋 Сообщения для анимации:', botMessages.map(msg => msg.text.substring(0, 30) + '...'));
   
-  // Показываем быстрые кнопки только если это первое сообщение бота
-  if (botMessages.length === 1 && !showQuickReplies.value) {
-    showQuickReplies.value = true;
-    console.log('✅ Показаны быстрые кнопки для первого сообщения бота');
-    setTimeout(() => scrollToBottom(), 200);
-  }
+  // Быстрые кнопки уже должны быть показаны при получении bot_text
   
   // Отмечаем, что анимация началась
   hasAnimatedExistingMessages.value = true;
@@ -527,13 +523,6 @@ const animateExistingBotMessages = async () => {
           messages.value.push(botMessage);
           scrollToBottom();
           console.log(`✅ Сообщение ${i + 1} добавлено в чат:`, botMessage.text.substring(0, 30) + '...');
-          
-          // Быстрые кнопки уже показаны при добавлении в очередь, проверяем только для логирования
-          const botMessagesCount = messages.value.filter(msg => msg.isBot).length;
-          console.log('🔍 Состояние быстрых кнопок после добавления существующего сообщения:', {
-            botMessagesCount,
-            showQuickReplies: showQuickReplies.value
-          });
           resolve();
         } else {
           setTimeout(checkCompletion, 100);
@@ -553,33 +542,6 @@ const animateExistingBotMessages = async () => {
   console.log('🎉 Анимация всех сообщений бота завершена');
 };
 
-// Функция для тестирования эффекта печатания
-const testTypingEffect = async () => {
-  console.log('🧪 Тестируем эффект печатания с очередью сообщений');
-  
-  const testMessages = [
-    'Привет! Это первое тестовое сообщение для демонстрации эффекта печатания.',
-    'Вот второе сообщение - оно будет показано после первого с паузой.',
-    'И третье сообщение - все они будут анимированы последовательно!',
-    'Посмотрите, как красиво работает очередь сообщений!'
-  ];
-  
-  // Добавляем все тестовые сообщения в очередь
-  for (let i = 0; i < testMessages.length; i++) {
-    const message = testMessages[i];
-    const messageObj = { 
-      id: generateMessageId(), 
-      text: message, 
-      isBot: true, 
-      timestamp: getCurrentTimeString() 
-    };
-    
-    console.log(`📥 Добавляем тестовое сообщение ${i + 1} в очередь:`, message.substring(0, 30) + '...');
-    addMessageToQueue(messageObj);
-  }
-  
-  console.log('🎉 Все тестовые сообщения добавлены в очередь');
-};
 
 // Функция для добавления сообщения в очередь анимации
 const addMessageToQueue = (message: { id: string; text: string; isBot: boolean; timestamp: string }) => {
@@ -591,31 +553,6 @@ const addMessageToQueue = (message: { id: string; text: string; isBot: boolean; 
   });
   
   botMessageQueue.value.push(message);
-  
-  // Показываем быстрые кнопки сразу при добавлении первого сообщения бота
-  const existingBotMessages = messages.value.filter(msg => msg.isBot).length;
-  const totalBotMessages = existingBotMessages + botMessageQueue.value.length;
-  
-  console.log('🔍 ДЕТАЛЬНАЯ ПРОВЕРКА ПОКАЗА БЫСТРЫХ КНОПОК:', {
-    existingBotMessages,
-    queueLength: botMessageQueue.value.length,
-    totalBotMessages,
-    showQuickReplies: showQuickReplies.value,
-    shouldShow: totalBotMessages === 1 && !showQuickReplies.value
-  });
-  
-  if (totalBotMessages === 1 && !showQuickReplies.value) {
-    showQuickReplies.value = true;
-    console.log('✅ Показаны быстрые кнопки сразу при добавлении первого сообщения бота в очередь');
-    setTimeout(() => scrollToBottom(), 200);
-  } else {
-    console.log('❌ Быстрые кнопки НЕ показаны. Причины:', {
-      totalBotMessages,
-      showQuickReplies: showQuickReplies.value,
-      condition1: totalBotMessages === 1,
-      condition2: !showQuickReplies.value
-    });
-  }
   
   // Запускаем обработку очереди, если она еще не обрабатывается
   if (!isProcessingQueue.value) {
@@ -662,12 +599,15 @@ const processMessageQueue = async () => {
           scrollToBottom();
           console.log(`✅ Сообщение из очереди добавлено в чат:`, message.text.substring(0, 30) + '...');
           
-          // Быстрые кнопки уже показаны при добавлении в очередь, проверяем только для логирования
-          const botMessagesCount = messages.value.filter(msg => msg.isBot).length;
-          console.log('🔍 Состояние быстрых кнопок после добавления сообщения:', {
-            botMessagesCount,
-            showQuickReplies: showQuickReplies.value
-          });
+          // Показываем быстрые кнопки только для первого bot_text (счетчик = 1)
+          if (botTextCount.value === 1) {
+            showQuickReplies.value = true;
+            console.log('✅ Показаны быстрые кнопки для первого bot_text (счетчик = 1)');
+            setTimeout(() => scrollToBottom(), 200);
+          } else {
+            console.log('⏭️ Быстрые кнопки не показываем, счетчик bot_text:', botTextCount.value);
+          }
+          
           resolve();
         } else {
           setTimeout(checkCompletion, 100);
@@ -738,6 +678,14 @@ const { currentDate, currentTime, getCurrentTimeString } = useDateTime();
 // Функция для генерации уникального ID сообщения
 const generateMessageId = () => {
   return 'msg_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+};
+
+// Функция для скрытия быстрых кнопок
+const hideQuickReplies = () => {
+  if (showQuickReplies.value) {
+    showQuickReplies.value = false;
+    console.log('✅ Быстрые кнопки скрыты');
+  }
 };
 
 
@@ -855,7 +803,7 @@ const connectWebSocket = () => {
            // Сбрасываем флаг прерывания при получении финального текста
            isBotInterrupted.value = false;
            
-           // Останавливаем текущую анимацию печатания и очищаем накопленное сообщение
+           // Завершаем текущую анимацию печатания принудительно
            if (typingInterval) {
              clearTimeout(typingInterval);
              typingInterval = null;
@@ -865,7 +813,11 @@ const connectWebSocket = () => {
            displayedTypingMessage.value = '';
            accumulatedMessage.value = '';
            
-           console.log('🛑 Остановлена анимация печатания при получении bot_text');
+           console.log('🛑 Завершена текущая анимация печатания при получении bot_text');
+           
+           // Увеличиваем счетчик bot_text сообщений
+           botTextCount.value++;
+           console.log('📊 Счетчик bot_text:', botTextCount.value);
            
            // Проверяем, есть ли текст для добавления
            if (data.text && data.text.trim()) {
@@ -887,6 +839,9 @@ const connectWebSocket = () => {
                // Создаем сообщение для анимации
                const message = { id: generateMessageId(), text: cleanText, isBot: true, timestamp: getCurrentTimeString() };
                
+               // НЕ показываем быстрые кнопки сразу - они появятся после завершения анимации
+               console.log('📝 Получен bot_text, быстрые кнопки появятся после завершения анимации');
+               
                // Добавляем в очередь для последовательной анимации
                addMessageToQueue(message);
                
@@ -904,6 +859,9 @@ const connectWebSocket = () => {
                
                if (!messageExists) {
                  console.log('🎬 Добавляем сообщение из печатания в очередь анимации');
+                 
+                 // НЕ показываем быстрые кнопки сразу - они появятся после завершения анимации
+                 console.log('📝 Получен bot_text из печатания, быстрые кнопки появятся после завершения анимации');
                  
                  // Создаем сообщение для анимации
                  const message = { id: generateMessageId(), text: cleanTypingText, isBot: true, timestamp: getCurrentTimeString() };
@@ -1013,6 +971,10 @@ const connectWebSocket = () => {
                isUserTyping.value = false;
                currentUserMessage.value = '';
                messages.value.push({ id: generateMessageId(), text: cleanText, isBot: false, timestamp: getCurrentTimeString() });
+               
+               // Скрываем быстрые кнопки при получении первого сообщения от пользователя
+               hideQuickReplies();
+               
                scrollToBottom();
                console.log('📝 Добавили в чат:', cleanText);
              } else {
@@ -1187,7 +1149,7 @@ const sendText = () => {
    if (!textInput.value.trim()) return;
    
    // Скрываем быстрые кнопки при отправке любого сообщения
-   showQuickReplies.value = false;
+   hideQuickReplies();
    
     if (ws.value && ws.value.readyState === WebSocket.OPEN) {
      const message = { type: 'text', text: textInput.value };
@@ -1222,7 +1184,7 @@ const goToHome = () => router.push('/home');
 // Функция для отправки быстрого ответа
 const sendQuickReply = (option: string) => {
   // Скрываем быстрые кнопки после выбора
-  showQuickReplies.value = false;
+  hideQuickReplies();
   
   // Отправляем выбранный вариант как обычное сообщение
   if (ws.value && ws.value.readyState === WebSocket.OPEN) {
@@ -1284,7 +1246,7 @@ const onKey = (key: string) => {
      console.log('🎤 Начинаем запись PCM - аудио от бота продолжает играть');
      
      // Скрываем быстрые кнопки при начале записи
-     showQuickReplies.value = false;
+     hideQuickReplies();
      
      // Сбрасываем флаг прерывания при начале новой записи
      isBotInterrupted.value = false;
