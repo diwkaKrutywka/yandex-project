@@ -6,7 +6,7 @@ export function ScheduleApi<T = any>(
     data?: Record<string, any>,
     method: Method = 'POST'
   ): Promise<AxiosResponse<T>> {
-    console.log('🔧 ScheduleApi вызван:', { url, data, method });
+  
     
     const config: AxiosRequestConfig = {
       url: `doctors${url}`,
@@ -19,7 +19,6 @@ export function ScheduleApi<T = any>(
       config.params = data
     }
     
-    console.log('🔧 ScheduleApi config:', config);
   
     return http(config)
   }

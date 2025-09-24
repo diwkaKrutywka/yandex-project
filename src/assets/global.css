@@ -22,3 +22,10 @@ html, body {
     0 0 12px rgba(17, 174, 120, 0.4),
     0 0 24px rgba(17, 174, 120, 0.3);
 }
+.ant-modal .ant-modal-body {
+  padding: 0 !important;
+}
+
+.ant-modal .ant-modal-content {
+  padding: 0 !important;
+}

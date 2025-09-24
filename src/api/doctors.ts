@@ -23,6 +23,7 @@ export function DoctorsApi<T = any>(
 // Типы для врачей
 export interface Doctor {
   id: string;
+  doctor_id: string;
   full_name: string;
   specialty: string;
   cabinet: string;
