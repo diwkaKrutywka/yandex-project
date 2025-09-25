@@ -4,15 +4,15 @@
     width="600px"
     centered
     :footer="null"
-      :wrap-class-name="'no-padding-modal'"
+    :wrap-class-name="'no-padding-modal'"
     class="schedule-modal"
-      :styles="{ body: { padding: 0 } }"
+    :styles="{ body: { padding: 0, maxHeight: '80vh', overflowY: 'auto' } }"
     @cancel="handleClose"
     @update:open="(val: boolean) => emit('update:visible', val)"
   >
     <div class="modal-inner" >
       <!-- Инфо о докторе -->
-      <div v-if="doctor" class="text-center mb-4 p-8">
+      <div v-if="doctor && !isPaidService" class="text-center mb-4 p-8">
         <div class="font-bold text-lg">{{ doctor.full_name }}</div>
         <div class="text-green-600">
           {{ doctor.specialty }} / Каб. №{{ doctor.cabinet }}
@@ -20,6 +20,27 @@
         <div class="text-gray-500 text-sm">
           {{ doctor.schedule_string }}
         </div>
+      </div>
+
+      <!-- Селект врача для платных услуг -->
+      <div v-if="doctor && isPaidService" class="mb-4 p-4 bg-gray-50 rounded-lg text-center flex flex-col items-center justify-center">
+        <div class="font-bold text-lg text-[#11AE78] mb-4">{{ doctor.full_name }}</div>
+        <div class="font-semibold mb-2 text-center text-gray-700">Выберите врача:</div>
+        <a-select
+          v-model:value="selectedDoctorForPaid"
+          placeholder="Выберите врача"
+          class="w-full max-w-md mx-auto"
+          size="large"
+          @change="onDoctorChange"
+        >
+          <a-select-option
+            v-for="doctor in availableDoctors"
+            :key="doctor.id"
+            :value="doctor.id"
+          >
+            {{ doctor.name }} - {{ doctor.specialty }}
+          </a-select-option>
+        </a-select>
       </div>
 
       <!-- Календарь -->
@@ -81,7 +102,7 @@
         <a-button
           type="primary"
           class="custom-green-btn px-8 py-6"
-          :disabled="!selectedDate || !selectedTime"
+          :disabled="!selectedDate || !selectedTime || (isPaidService && !selectedDoctorForPaid)"
           @click="bookAppointment"
         >
           <span class="text-white px-6"> Записаться </span>
@@ -128,7 +149,16 @@
         <div class="info-section">
           <div class="info-label">Прием</div>
           <div class="info-value">
-            {{ doctor?.full_name }} ({{ doctor?.specialty }})
+            <template v-if="isPaidService">
+              {{ selectedPaidService?.full_name }} ({{ selectedPaidService?.specialty }})
+              <br>
+              <span class="text-sm text-gray-500">
+                Врач: {{ availableDoctors.find(d => d.id === selectedDoctorForPaid)?.name }}
+              </span>
+            </template>
+            <template v-else>
+              {{ doctor?.full_name }} ({{ doctor?.specialty }})
+            </template>
           </div>
           <div class="info-divider"></div>
         </div>
@@ -152,6 +182,20 @@
           <div class="info-value">Городская поликлиника</div>
           <div class="info-divider"></div>
         </div>
+
+        <!-- Информация о стоимости для платных услуг -->
+        <div v-if="isPaidService && selectedPaidService" class="info-section">
+          <div class="info-label">Стоимость</div>
+          <div class="info-value">
+            <div class="text-green-600 font-bold">
+              Первый приём: {{ selectedPaidService.first_price }} ₸
+            </div>
+            <div class="text-gray-600 text-sm">
+              Последующий: {{ selectedPaidService.next_price }} ₸
+            </div>
+          </div>
+          <div class="info-divider"></div>
+        </div>
       </div>
 
       <!-- Инструкция -->
@@ -164,10 +208,10 @@
       <div class="confirmation-button-container">
         <div
           class="rounded-full bg-[#0C593E] text-white px-4 py-2 font-bold cursor-pointer max-w-xs mx-auto text-[16px] text-center"
-          :class="{ 'opacity-50 cursor-not-allowed': isCreatingAppointment }"
+          :class="{ 'opacity-50 cursor-not-allowed': isCreatingAppointment && !isPaidService }"
           @click="confirmAppointment"
         >
-          <span v-if="isCreatingAppointment">Создание записи...</span>
+          <span v-if="isCreatingAppointment && !isPaidService">Создание записи...</span>
           <span v-else>Подтвердить</span>
         </div>
       </div>
@@ -205,6 +249,8 @@ interface Doctor {
 const props = defineProps<{
   visible: boolean;
   doctor: Doctor | null;
+  isPaidService?: boolean;
+  selectedPaidService?: any;
 }>();
 
 const emit = defineEmits(["update:visible", "booked"]);
@@ -217,6 +263,15 @@ console.log("🎬 SchedulePage инициализирован с пропсам�
 const selectedDate = ref<Dayjs | null>(dayjs()); // сегодня по умолчанию
 const selectedTime = ref<string | null>(null);
 const timeSlots = ref<any[]>([]);
+const selectedDoctorForPaid = ref<string | null>(null);
+
+// Мок-данные врачей для платных услуг
+const availableDoctors = ref([
+  { id: "1", name: "Доктор Ахметов А.А.", specialty: "Хирург" },
+  { id: "2", name: "Доктор Смирнова Е.В.", specialty: "Окулист" },
+  { id: "3", name: "Доктор Козлов И.П.", specialty: "Кардиолог" },
+  { id: "4", name: "Доктор Петрова М.С.", specialty: "Невролог" }
+]);
 
 // Модалка подтверждения
 const showConfirmation = ref(false);
@@ -236,10 +291,23 @@ function handleClose() {
   emit("update:visible", false);
 }
 
+function onDoctorChange(doctorId: string) {
+  console.log('👨‍⚕️ Выбран врач:', doctorId);
+  selectedDoctorForPaid.value = doctorId;
+  // Сбрасываем время при смене врача
+  selectedTime.value = null;
+  timeSlots.value = [];
+  
+  // Загружаем слоты для выбранного врача и даты
+  if (selectedDate.value) {
+    loadTimeSlots(selectedDate.value);
+  }
+}
+
 // Загружаем слоты времени при открытии модалки
 onMounted(async () => {
   console.log("🚀 SchedulePage mounted, doctor:", props.doctor);
-  // Не загружаем здесь, ждем когда модалка откроется
+  selectedDoctorForPaid.value = '1';
 });
 
 // Загружаем слоты времени при появлении доктора
@@ -247,10 +315,7 @@ watch(
   () => props.doctor,
   async (doctor) => {
     if (doctor?.id && selectedDate.value) {
-      console.log(
-        "👀 Загружаем слоты для выбранной даты:",
-        selectedDate.value.format("YYYY-MM-DD")
-      );
+   
       await loadTimeSlots(selectedDate.value);
     }
   },
@@ -288,10 +353,7 @@ watch(
 watch([() => props.visible, () => props.doctor], async ([visible, doctor]) => {
   console.log("👀 Watcher [visible, doctor] сработал:", { visible, doctor });
   if (visible && doctor?.doctor_id && selectedDate.value) {
-    console.log(
-      "👀 Комбинированный watcher: загружаем слоты для:",
-      selectedDate.value.format("YYYY-MM-DD")
-    );
+
     await loadTimeSlots(selectedDate.value);
   }
 });
@@ -299,35 +361,48 @@ watch([() => props.visible, () => props.doctor], async ([visible, doctor]) => {
 // Загружаем слоты времени при выборе даты
 watch(selectedDate, async (date) => {
   if (!date) {
-    console.log("👀 Watcher: пропускаем - нет даты");
+   
     return;
   }
 
   if (!props.doctor?.doctor_id) {
-    console.log("👀 Watcher: пропускаем - нет доктора");
+  
     return;
   }
 
-  console.log("👀 Watcher: загружаем слоты времени");
   await loadTimeSlots(date);
 });
 
 async function loadTimeSlots(date: Dayjs) {
-  console.log("⏰ loadTimeSlots вызвана с параметрами:", {
-    date: date.format("YYYY-MM-DD"),
-    doctorId: props.doctor?.doctor_id,
-    hasDoctor: !!props.doctor?.doctor_id,
-  });
 
-  if (!props.doctor?.doctor_id) {
-    console.log("❌ loadTimeSlots: нет doctor.doctor_id, выходим");
+  // Для платных услуг нужен выбранный врач
+  if (props.isPaidService && !selectedDoctorForPaid.value) {
+   
+    timeSlots.value = [];
+    return;
+  }
+
+  // Для ОСМС нужен doctor_id
+  if (!props.isPaidService && !props.doctor?.doctor_id) {
     return;
   }
 
   console.log("⏰ Загружаем слоты времени для:", date.format("YYYY-MM-DD"));
   try {
+    let doctorId = props.doctor?.doctor_id;
+    
+    // Для платных услуг используем выбранного врача
+    if (props.isPaidService && selectedDoctorForPaid.value) {
+      doctorId = selectedDoctorForPaid.value;
+    }
+
+    if (!doctorId) {
+      timeSlots.value = [];
+      return;
+    }
+
     const res = await ScheduleApi(
-      `/${props.doctor.doctor_id}/schedule`,
+      `/${doctorId}/schedule`,
       { date: date.format("YYYY-MM-DD") },
       "GET"
     );
@@ -379,16 +454,77 @@ function bookAppointment() {
 }
 
 async function confirmAppointment() {
-  if (!selectedDate.value || !selectedTime.value || !props.doctor) return;
+  if (!selectedDate.value || !selectedTime.value) return;
   
+  // Для платных услуг нужен выбранный врач
+  if (props.isPaidService && !selectedDoctorForPaid.value) {
+    alert('Пожалуйста, выберите врача');
+    return;
+  }
+  
+  // Для ОСМС нужен доктор
+  if (!props.isPaidService && !props.doctor) {
+    alert('Ошибка: не выбран доктор');
+    return;
+  }
+  
+  let doctorId: string;
+  
+  if (props.isPaidService) {
+    doctorId = selectedDoctorForPaid.value!;
+  } else {
+    doctorId = props.doctor!.doctor_id;
+  }
+  
+  console.log('🎉 SchedulePage: Подтверждение записи');
+  console.log('🔍 SchedulePage: isPaidService:', props.isPaidService);
+  
+  // Для платных услуг не отправляем запрос на API, сразу показываем результат
+  if (props.isPaidService) {
+    console.log('💰 Платная услуга - пропускаем API запрос');
+    
+    // Создаем мок-результат для платной услуги
+    const mockResult = {
+      id: Date.now(), // Генерируем уникальный ID
+      date: selectedDate.value.format("YYYY-MM-DD"),
+      time: selectedTime.value,
+      doctor_id: parseInt(doctorId),
+      patient_code: 1001,
+      status: "confirmed",
+      is_paid_service: true,
+      service_name: props.selectedPaidService?.full_name || "Платная услуга",
+      price: props.selectedPaidService?.first_price || 0
+    };
+    
+    appointmentResult.value = mockResult;
+    
+    // Эмитим событие с результатом
+    emit("booked", {
+      doctorId: doctorId,
+      date: selectedDate.value.format("YYYY-MM-DD"),
+      time: selectedTime.value,
+      patientData: patientData.value,
+      appointmentResult: mockResult,
+      isPaidService: props.isPaidService,
+      selectedPaidService: props.selectedPaidService
+    });
+    
+    // Закрываем модалку подтверждения
+    showConfirmation.value = false;
+    // Закрываем основную модалку
+    handleClose();
+    
+    return;
+  }
+  
+  // Для ОСМС отправляем запрос на API
   const appointmentData: CreateAppointmentRequest = {
     date: selectedDate.value.format("YYYY-MM-DD"),
-    doctor_id: parseInt(props.doctor.doctor_id),
+    doctor_id: parseInt(doctorId),
     patient_code: 1001, // Используем дефолтный код пациента
     time: selectedTime.value,
   };
   
-  console.log('🎉 SchedulePage: Подтверждение записи, отправляем запрос');
   console.log('🔍 SchedulePage: appointmentData:', appointmentData);
   
   try {
@@ -402,11 +538,13 @@ async function confirmAppointment() {
     
     // Эмитим событие с результатом
     emit("booked", {
-      doctorId: props.doctor.doctor_id,
+      doctorId: doctorId,
       date: selectedDate.value.format("YYYY-MM-DD"),
       time: selectedTime.value,
       patientData: patientData.value,
-      appointmentResult: result
+      appointmentResult: result,
+      isPaidService: props.isPaidService,
+      selectedPaidService: props.selectedPaidService
     });
     
     // Закрываем модалку подтверждения
@@ -461,6 +599,7 @@ function formatDate(date: Dayjs | null) {
 }
 :deep(.ant-modal-header) {
   padding: 0 !important;
+  justify-content: center;
 }
 :deep(.ant-modal-content) {
   border-radius: 12px;
@@ -500,16 +639,86 @@ function formatDate(date: Dayjs | null) {
   font-weight: bold !important;
 }
 .mini-calendar {
-  max-width: 300px;
+  max-width: 400px;
   margin: 0 auto;
   border-radius: 12px;
   overflow: hidden;
+  width: 100%;
+}
+
+/* Адаптивность для мобильных устройств */
+@media (max-width: 640px) {
+  .mini-calendar {
+    max-width: 350px;
+  }
 }
 
 /* фон календаря */
 :deep(.ant-picker-panel) {
   background-color: #e8f4f2 !important;
   border-radius: 12px;
+}
+
+/* Стили для селектора года/месяца */
+:deep(.ant-picker-header) {
+  background-color: #e8f4f2 !important;
+  border-bottom: 1px solid #d1f3e5 !important;
+  padding: 8px 12px !important;
+
+}
+
+:deep(.ant-picker-header-view) {
+  color: #11ae78 !important;
+  font-weight: bold !important;
+  font-size: 16px !important;
+}
+
+:deep(.ant-picker-header-super-prev-btn),
+:deep(.ant-picker-header-prev-btn),
+:deep(.ant-picker-header-next-btn),
+:deep(.ant-picker-header-super-next-btn) {
+  color: #11ae78 !important;
+  font-size: 16px !important;
+}
+
+:deep(.ant-picker-header-super-prev-btn:hover),
+:deep(.ant-picker-header-prev-btn:hover),
+:deep(.ant-picker-header-next-btn:hover),
+:deep(.ant-picker-header-super-next-btn:hover) {
+  color: #0c593e !important;
+  background-color: rgba(17, 174, 120, 0.1) !important;
+  border-radius: 4px !important;
+}
+
+/* Стили для выпадающих списков года/месяца */
+:deep(.ant-picker-dropdown) {
+  background-color: #e8f4f2 !important;
+  border-radius: 12px !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
+}
+
+:deep(.ant-picker-dropdown .ant-picker-panel) {
+  background-color: #e8f4f2 !important;
+  border-radius: 12px !important;
+}
+
+:deep(.ant-picker-dropdown .ant-picker-cell) {
+  color: #333 !important;
+}
+
+:deep(.ant-picker-dropdown .ant-picker-cell:hover) {
+  background-color: rgba(17, 174, 120, 0.1) !important;
+  color: #11ae78 !important;
+}
+
+:deep(.ant-picker-dropdown .ant-picker-cell-selected) {
+  background-color: #11ae78 !important;
+  color: white !important;
+}
+
+:deep(.ant-picker-dropdown .ant-picker-cell-selected:hover) {
+  background-color: #0c593e !important;
+  color: white !important;
 }
 
 /* ячейки дней */
@@ -533,6 +742,19 @@ function formatDate(date: Dayjs | null) {
   border-radius: 50%;
 }
 
+/* Стили для селекта врача */
+
+
+:deep(.ant-select-selector) {
+  border-radius: 8px !important;
+  border-color: #11ae78 !important;
+}
+
+:deep(.ant-select-focused .ant-select-selector) {
+  border-color: #11ae78 !important;
+  box-shadow: 0 0 0 2px rgba(17, 174, 120, 0.2) !important;
+}
+
 /* Стили для модалки подтверждения */
 .confirmation-content {
   background: white;
@@ -543,7 +765,12 @@ function formatDate(date: Dayjs | null) {
 .confirmation-header {
   padding: 24px 24px 16px 24px;
 }
-
+:deep(.ant-picker-calendar .ant-picker-calendar-header) {
+    display: flex
+;
+    justify-content: center;
+    padding: 12px 0;
+}
 .confirmation-title {
   font-size: 24px;
   font-weight: bold;

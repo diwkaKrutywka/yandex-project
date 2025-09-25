@@ -59,7 +59,11 @@
               <template #bodyCell="{ column, record }">
                 <template v-if="column.key === 'action'">
                   <div>
-                    <div>{{ record.schedule_string }}</div>
+                    <div class="schedule-text">
+                      <div v-for="(schedule, index) in record.schedule_string.split(';')" :key="index" class="schedule-item">
+                        {{ schedule.trim() }}
+                      </div>
+                    </div>
                     <div  class="border-2 border-[#11AE78] rounded-full px-4 py-2 text-[#11AE78] font-bold w-fit" @click="openScheduleModal(record)">
                       Записаться
                     </div>
@@ -84,7 +88,7 @@
               <template #bodyCell="{ column, record }">
                 <template v-if="column.key === 'action'">
                   <div class="flex items-center">
-                    <div  class="border-2 border-[#11AE78] rounded-full px-4 py-2 text-[#11AE78] font-bold w-fit">
+                    <div  class="border-2 border-[#11AE78] rounded-full px-4 py-2 text-[#11AE78] font-bold w-fit cursor-pointer" @click="openScheduleModalForPaid(record)">
                       Записаться
                     </div>
                     <div  class="ml-2 custom-green-btn rounded-full w-8 h-8 flex items-center justify-center text-white cursor-pointer" @click="openDescriptionModal(record)">?</div>
@@ -103,7 +107,13 @@
       <FooterNav :showHomeButton="true" />
     </div>
     
-    <SchedulePage v-model:visible="visible" :doctor="doctor" @booked="handleAppointmentBooked" />
+    <SchedulePage 
+      v-model:visible="visible" 
+      :doctor="doctor" 
+      :is-paid-service="isPaidService"
+      :selected-paid-service="selectedPaidService"
+      @booked="handleAppointmentBooked" 
+    />
     
     <!-- Модалка подтверждения записи -->
     <a-modal
@@ -186,15 +196,18 @@
 
 <script lang="ts" setup>
 import { ref, onMounted } from "vue";
-import { useRoute } from "vue-router";
+import { useRoute, useRouter } from "vue-router";
 import { useDateTime } from "../composables/useDateTime";
 import { DoctorsApi, type Doctor } from "../api/doctors";
 import FooterNav from "../components/FooterNav.vue";
 import CheckIin from "./CheckIin.vue";
 import SchedulePage from "../components/SchedulePage.vue";
 import ApprovePage from "../components/ApprovePage.vue";
+import { useUserStore } from "../store/index";
 const route = useRoute();
+const router = useRouter();
 const { currentDate, currentTime } = useDateTime();
+const userStore = useUserStore();
 const isLoading = ref(false);
 const error = ref<string | null>(null);
 const doctors = ref<Doctor[]>([]);
@@ -210,6 +223,8 @@ const showApprovePage = ref(false);
 const appointmentResult = ref<any>(null);
 const showDescriptionModal = ref(false);
 const selectedService = ref<any>(null);
+const isPaidService = ref(false);
+const selectedPaidService = ref<any>(null);
 // Колонки для ОСМС
 const columnsOSMS = [
   { title: "ФИО врача", dataIndex: "full_name", key: "full_name", width: "20%" },
@@ -220,10 +235,10 @@ const columnsOSMS = [
 
 // Колонки для платных услуг
 const columnsPaid = [
-  { title: "Название", dataIndex: "full_name", key: "full_name" },
-  { title: "Услуга", dataIndex: "specialty", key: "specialty" },
-  { title: "Стоимость (1-ый приём)", dataIndex: "first_price", key: "first_price" },
-  { title: "Стоимость (последующий)", dataIndex: "next_price", key: "next_price" },
+  { title: "Название", dataIndex: "full_name", key: "full_name", width: "20%" },
+  { title: "Услуга", dataIndex: "specialty", key: "specialty", width: "20%" },
+  { title: "Стоимость (1-ый приём)", dataIndex: "first_price", key: "first_price", width: "20%" },
+  { title: "Стоимость (последующий)", dataIndex: "next_price", key: "next_price", width: "20%" },
   { title: "", key: "action" },
 ];
 
@@ -346,7 +361,42 @@ async function fetchDoctors() {
 }
 function openScheduleModal(selectedDoctor: Doctor) {
   console.log('🎯 openScheduleModal вызван с доктором:', selectedDoctor);
+  
+  // Проверяем наличие ИИН
+  if (!userStore.iin) {
+    router.push("/auth-page");
+    return;
+  }
+  
   doctor.value = selectedDoctor;
+  isPaidService.value = false;
+  selectedPaidService.value = null;
+  visible.value = true;
+  console.log('🎯 visible.value установлен в:', visible.value);
+  console.log('🎯 doctor.value установлен в:', doctor.value);
+}
+
+function openScheduleModalForPaid(service: any) {
+  console.log('🎯 openScheduleModalForPaid вызван с услугой:', service);
+  
+  // Проверяем наличие ИИН
+  if (!userStore.iin) {
+    router.push("/auth-page");
+    return;
+  }
+  
+  selectedPaidService.value = service;
+  isPaidService.value = true;
+  // Создаем фиктивного доктора для платной услуги
+  doctor.value = {
+    id: service.id.toString(),
+    doctor_id: service.id.toString(),
+    full_name: service.full_name,
+    specialty: service.specialty,
+    cabinet: "Платный кабинет",
+    schedule_string: "По записи",
+    type: "paid"
+  };
   visible.value = true;
   console.log('🎯 visible.value установлен в:', visible.value);
   console.log('🎯 doctor.value установлен в:', doctor.value);
@@ -448,6 +498,24 @@ function closeDescriptionModal() {
   border-color: #11ae78 !important;
   color: #fff !important;
 }
+
+/* Стили для расписания */
+.schedule-text {
+  margin-bottom: 8px;
+  max-width: 200px;
+}
+
+.schedule-item {
+  font-size: 13px;
+  color: #333;
+  line-height: 1.4;
+  margin-bottom: 4px;
+  word-wrap: break-word;
+}
+
+.schedule-item:last-child {
+  margin-bottom: 0;
+}
 .question-btn {
   border: 1px solid #11ae78 !important;
   color: #11ae78 !important;
@@ -470,7 +538,7 @@ function closeDescriptionModal() {
 
 /* Прокрутка для таблиц */
 .custom-tabs {
-  height: 100%;
+  height: calc(100vh - 200px);
   display: flex;
   flex-direction: column;
 }
@@ -482,15 +550,19 @@ function closeDescriptionModal() {
 .custom-tabs .ant-tabs-content-holder {
   flex: 1;
   overflow: hidden;
+  display: flex;
+  flex-direction: column;
 }
 
 .custom-tabs .ant-tabs-tabpane {
   height: 100%;
+  display: flex;
+  flex-direction: column;
 }
 
 /* Прокрутка для div контейнера таблиц */
 .table-container {
-  max-height: 400px;
+  max-height: 40vh;
   overflow-y: auto;
   overflow-x: auto;
 }
@@ -656,6 +728,26 @@ function closeDescriptionModal() {
   .close-button {
     padding: 10px 20px;
     font-size: 13px;
+  }
+
+  /* Адаптивные стили для расписания на мобильных */
+  .schedule-text {
+    max-width: 150px;
+  }
+
+  .schedule-item {
+    font-size: 12px;
+    line-height: 1.3;
+  }
+
+  /* Адаптивная высота для мобильных */
+  .custom-tabs {
+    height: calc(100vh - 150px);
+  }
+
+  .table-container {
+    height: calc(100vh - 250px);
+    max-height: 400px;
   }
 }
 </style>

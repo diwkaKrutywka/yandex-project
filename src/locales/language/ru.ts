@@ -162,4 +162,33 @@ export default {
   help_center: "Справочная<br/> информация",
   ask_aigerim: "Спросить у Айгерим",
   search_placeholder: "Найти врача/услугу",
+  back_button: "Назад",
+  home_button: "На главную",
+  language_kaz: "Қаз",
+  language_rus: "Рус",
+  // CheckIin.vue
+  appointment_title: "Запись на прием",
+  appointment_description: "Чтобы записаться на прием<br/>введите ваш ИИН",
+  iin_label: "ИИН",
+  iin_value: "ИИН:",
+  patient_name: "Амандыков Алмаз Ахметулы",
+  patient_section: "Участок №3",
+  book_therapist: "Записаться к терапевту",
+  // LanguageSelectionView.vue
+  welcome_kazakh: "№3 емханаға қош<br/>келдіңіздер",
+  welcome_russian: "Добро пожаловать<br/>в поликлинику",
+  select_language: "Выберите язык",
+  language_kazakh: "Қазақ",
+  language_russian: "Русский",
+  // AuthPage.vue
+  auth_title: "Запись на прием",
+  auth_description: "Чтобы записаться на прием<br/>введите ваш ИИН",
+  authorize_button: "Авторизоваться",
+  data_protection: "Ваши данные защищены и используются<br/>только для проверки в поликлинике",
+  auth_success: "Вы авторизованы с ИИН:",
+  auth_error: "Введите корректный ИИН (12 цифр)",
+  // InfoDetails.vue
+  general_services: "Общие услуги",
+  // InfoService.vue
+  service_info: "Информация об услугах",
 };

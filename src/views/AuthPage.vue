@@ -26,12 +26,10 @@
         class="flex flex-col bg-white m-auto w-full max-w-sm sm:max-w-md lg:max-w-lg px-4"
       >
         <span class="text-[#11AE78] text-xl sm:text-2xl font-bold mb-2 text-center">
-          Запись на прием
+          {{ $t('auth_title') }}
         </span>
 
-        <p class="text-gray-700 font-semibold mb-4 text-center text-sm sm:text-base">
-          Чтобы записаться на прием <br />
-          введите ваш ИИН
+        <p class="text-gray-700 font-semibold mb-4 text-center text-sm sm:text-base" v-html="$t('auth_description')">
         </p>
 
         <!-- Поле для ИИН -->
@@ -80,12 +78,10 @@
           class="bg-[#0C593E] text-white font-bold my-4 px-20 sm:px-18 py-3 rounded-3xl shadow hover:bg-green-700 text-center cursor-pointer text-sm sm:text-base max-w-md mx-auto"
           @click="authorize"
         >
-          Авторизоваться
+          {{ $t('authorize_button') }}
         </div>
 
-        <span class="text-xs text-gray-500 mt-3 text-center">
-          Ваши данные защищены и используются <br />
-          только для проверки в поликлинике
+        <span class="text-xs text-gray-500 mt-3 text-center" v-html="$t('data_protection')">
         </span>
       </div>
     </main>
@@ -100,17 +96,15 @@ import { ref, onMounted } from "vue";
 import { useUserStore } from "../store/index";
 import FooterNav from "../components/FooterNav.vue";
 import { useDateTime } from "../composables/useDateTime";
-const { currentDate, currentTime } = useDateTime();
 import { useRouter } from "vue-router";
+import { useI18n } from "vue-i18n";
+
+const { currentDate, currentTime } = useDateTime();
+const { t: $t } = useI18n();
 const router = useRouter();
-const isLoading = ref(false);
-const error = ref<string | null>(null);
 
 // Состояние глобальной анимации
 const isGlobalAnimating = ref(true); // Начинаем со скрытого состояния
-
-// Состояние анимации специальностей
-const showSpecialties = ref(false);
 
 onMounted(() => {
   setTimeout(() => {
@@ -141,11 +135,11 @@ const backspace = () => {
 const authorize = () => {
   if (iin.value.length === 12) {
     userStore.setIin(iin.value);
-    alert(`Вы авторизованы с ИИН: ${iin.value}`);
+    alert(`${$t('auth_success')} ${iin.value}`);
     router.back()
     // здесь можно сделать router.push('/home') например
   } else {
-    alert("Введите корректный ИИН (12 цифр)");
+    alert($t('auth_error'));
   }
 };
 </script>

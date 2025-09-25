@@ -159,4 +159,33 @@ export default {
   help_center: "Көмек<br/>орталығы",
   ask_aigerim: "Айгерімнен сұрау",
   search_placeholder: "Іздеу...",
+  back_button: "Артқа",
+  home_button: "Басты бетке",
+  language_kaz: "Қаз",
+  language_rus: "Рус",
+  // CheckIin.vue
+  appointment_title: "Дәрігерге жазылу",
+  appointment_description: "Дәрігерге жазылу үшін<br/>ЖСН-ыңызды енгізіңіз",
+  iin_label: "ЖСН",
+  iin_value: "ЖСН:",
+  patient_name: "Амандыков Алмаз Ахметулы",
+  patient_section: "3-ші учаске",
+  book_therapist: "Терапевтке жазылу",
+  // LanguageSelectionView.vue
+  welcome_kazakh: "№3 емханаға қош<br/>келдіңіздер",
+  welcome_russian: "Добро пожаловать<br/>в поликлинику",
+  select_language: "Тілді таңдаңыз",
+  language_kazakh: "Қазақ",
+  language_russian: "Русский",
+  // AuthPage.vue
+  auth_title: "Дәрігерге жазылу",
+  auth_description: "Дәрігерге жазылу үшін<br/>ЖСН-ыңызды енгізіңіз",
+  authorize_button: "Авторизациялау",
+  data_protection: "Сіздің деректеріңіз қорғалған және<br/>тек емханада тексеру үшін қолданылады",
+  auth_success: "ЖСН-мен авторизацияландыңыз:",
+  auth_error: "Дұрыс ЖСН енгізіңіз (12 цифр)",
+  // InfoDetails.vue
+  general_services: "Жалпы қызметтер",
+  // InfoService.vue
+  service_info: "Қызмет туралы ақпарат",
 };

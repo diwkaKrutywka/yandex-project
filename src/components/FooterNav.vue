@@ -5,7 +5,7 @@
     <div class="flex items-center">
       <div
         @click="goBack"
-        class="bg-gradient-to-r from-[#14865E] to-[#11AE78] hover:from-[#117A52] hover:to-[#0E9A6A] flex items-center justify-center text-white px-3 py-2 rounded-full ml-4 transition-all duration-300 transform hover:scale-105 shadow-md hover:shadow-lg cursor-pointer"
+        class="border-2 border-[#11AE78] bg-gradient-to-r from-[#14865E] to-[#11AE78] hover:from-[#117A52] hover:to-[#0E9A6A] flex items-center justify-center text-white px-4 py-2.5 rounded-full ml-4 transition-all duration-300 transform hover:scale-105 shadow-md hover:shadow-lg cursor-pointer"
       >
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -23,7 +23,7 @@
         </svg>
         <span
           class="flex text-white items-center justify-center ml-2 my-auto mb-0 font-semibold text-xs sm:text-sm lg:text-base"
-          >Назад</span
+          >{{ $t('back_button') }}</span
         >
       </div>
 
@@ -31,17 +31,18 @@
       <div
         v-if="showHomeButton"
         @click="goHome"
-        class="flex bg-white items-center ml-6 justify-center px-3 py-2 rounded-full cursor-pointer text-[#11AE78] font-semibold text-xs sm:text-sm lg:text-base border-2 border-[#11AE78]"
+        class="flex bg-white items-center ml-6 justify-center px-4 py-2.5 rounded-full cursor-pointer text-[#11AE78] font-semibold text-xs sm:text-sm lg:text-base border-2 border-[#11AE78] transition-all duration-300 transform hover:scale-105 hover:shadow-lg"
       >
         <span
           class="flex items-center items-center justify-center ml-2 my-auto mb-0 font-semibold text-xs sm:text-sm lg:text-base"
-          >На главную</span
+          >{{ $t('home_button') }}</span
         >
       </div>
     </div>
     <!-- Индикатор языка -->
     <div
-      class="w-[120px] bg-gradient-to-r from-[#14865E] to-[#11AE78] h-full rounded-tl-[40px] flex items-center justify-center"
+      @click="toggleLanguage"
+      class="w-[120px] bg-gradient-to-r from-[#14865E] to-[#11AE78] h-full rounded-tl-[40px] flex items-center justify-center cursor-pointer transition-all duration-300 transform hover:scale-105 hover:shadow-lg"
     >
       <div
         class="w-12 h-12 rounded-full bg-white flex items-center justify-center shadow-md"
@@ -49,7 +50,7 @@
         <span
           class="text-[#14865E] text-sm font-bold"
         >
-          {{ currentLanguage === "kk" ? "Қаз" : "Рус" }}
+          {{ currentLanguage === "kk" ? $t('language_kaz') : $t('language_rus') }}
         </span>
       </div>
     </div>
@@ -65,7 +66,7 @@ interface Props {
   showHomeButton?: boolean;
 }
 
-const props = withDefaults(defineProps<Props>(), {
+withDefaults(defineProps<Props>(), {
   showHomeButton: false,
 });
 
@@ -74,7 +75,14 @@ const { locale } = useI18n();
 
 const currentLanguage = ref(locale.value);
 
-onMounted(() => {});
+onMounted(() => {
+  // Загружаем сохраненный язык из localStorage (используем currentLang как в конфигурации i18n)
+  const savedLanguage = localStorage.getItem("currentLang");
+  if (savedLanguage && (savedLanguage === "ru" || savedLanguage === "kk")) {
+    currentLanguage.value = savedLanguage;
+    locale.value = savedLanguage;
+  }
+});
 
 onUnmounted(() => {});
 
@@ -119,5 +127,17 @@ const goBack = () => {
 const goHome = () => {
   console.log("🏠 Нажата кнопка Главная");
   router.push("/home");
+};
+
+const toggleLanguage = () => {
+  console.log("🌐 Переключение языка");
+  const newLocale = currentLanguage.value === "ru" ? "kk" : "ru";
+  currentLanguage.value = newLocale;
+  locale.value = newLocale;
+  
+  // Сохраняем выбранный язык в localStorage (используем currentLang как в конфигурации i18n)
+  localStorage.setItem("currentLang", newLocale);
+  
+  console.log("✅ Язык изменен на:", newLocale);
 };
 </script>

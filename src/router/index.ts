@@ -39,6 +39,16 @@ const routes: RouteRecordRaw[] = [
       name: "DoctorsPage",
       component: () => import("../views/DoctorsPage.vue"),
     },
+    {
+      path: "/info-service",
+      name: "InfoService",
+      component: () => import("../views/InfoService.vue"),
+    },
+    {
+      path: "/info-details",
+      name: "InfoDetails",
+      component: () => import("../views/InfoDetails.vue"),
+    },
 ];
 
 const router = createRouter({

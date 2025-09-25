@@ -17,10 +17,10 @@
       </nav>
 
     <!-- Инфо о боте -->
-    <div class="p-4 font-semibold flex items-center">
-<div class="flex justify-between w-full mx-4">
-      <div class="flex ">
-        <div class="border-2 border-[#E8F4F2] rounded-full mr-2 video-glow w-10 h-10 sm:w-12 sm:h-12 lg:w-14 lg:h-14 flex items-center justify-center overflow-hidden">
+    <div class="p-2 sm:p-4 font-semibold flex items-center">
+<div class="flex justify-between w-full mx-2 sm:mx-4">
+      <div class="flex items-center">
+        <div class="border-2 border-[#E8F4F2] rounded-full mr-2 sm:mr-3 video-glow w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 lg:w-14 lg:h-14 flex items-center justify-center overflow-hidden">
         <video
           src="../assets/idle.mp4"
           autoplay
@@ -31,10 +31,10 @@
         ></video>
       </div>
         <div>
-        <div class="text-sm flex align-start">Алия</div>
-        <div class="text-sm opacity-80 flex items-center gap-1">
+        <div class="text-xs sm:text-sm md:text-base flex align-start">Алия</div>
+        <div class="text-xs sm:text-sm opacity-80 flex items-center gap-1">
           <div
-            :class="[ 'w-2 h-2 rounded-full',
+            :class="[ 'w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full',
               connectionStatus === 'connected' ? 'bg-green-700' :
               connectionStatus === 'connecting' ? 'bg-yellow-500' :
               connectionStatus === 'error' ? 'bg-red-500' : 'bg-gray-400' ]"
@@ -58,18 +58,18 @@
     <hr class="w-full text-gray-200" />
 
     <!-- Сообщения -->
-    <div ref="messagesContainer" class="flex-1 overflow-y-auto p-4 bg-white">
+    <div ref="messagesContainer" class="flex-1 overflow-y-auto p-2 sm:p-4 bg-white">
       <div v-for="msg in messages" :key="msg.id">
         <div
           :class="[
-            'mb-3 p-3 rounded-lg w-fit max-w-[80%] text-sm',
+            'mb-2 sm:mb-3 p-2 sm:p-3 rounded-lg w-fit max-w-[85%] sm:max-w-[80%] text-xs sm:text-sm',
             msg.isBot ? 'bg-white shadow-lg ml-0 mr-auto text-left' : 'bg-[#E8F4F2] ml-auto mr-0 shadow-lg text-left'
           ]"
           :style="{
             color: '#000000 !important'
           }"
         >
-          <div>{{ msg.text }}</div>
+          <div class="break-words">{{ msg.text }}</div>
           <div class="text-xs opacity-60 mt-1" :class="msg.isBot ? 'text-left' : 'text-right'">
             {{ msg.timestamp || getCurrentTimeString() }}
           </div>
@@ -78,13 +78,13 @@
       </div>
 
       <!-- Быстрые кнопки (показываются только для первого bot_text) -->
-      <div v-if="showQuickReplies" class="ml-0 mr-auto mb-3 max-w-[80%]">
-        <div class="grid grid-cols-2 gap-2">
+      <div v-if="showQuickReplies" class="ml-0 mr-auto mb-2 sm:mb-3 max-w-[85%] sm:max-w-[80%]">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-1 sm:gap-2">
           <div
             v-for="(option, index) in quickReplyOptions"
             :key="index"
             @click="sendQuickReply(option)"
-            class="px-3 py-2 bg-[#11AE78] text-white rounded-xl text-xs sm:text-sm font-medium hover:bg-[#0E9A6A] transition-all duration-300 transform hover:scale-105 shadow-sm cursor-pointer"
+            class="px-2 sm:px-3 py-1.5 sm:py-2 bg-[#11AE78] text-white rounded-lg sm:rounded-xl text-xs sm:text-sm font-medium hover:bg-[#0E9A6A] transition-all duration-300 transform hover:scale-105 shadow-sm cursor-pointer text-center"
           >
             {{ option }}
           </div>
@@ -147,14 +147,14 @@
 
 
     <!-- Разделительная линия между сообщениями и нижней панелью -->
-    <div class="border-t border-gray-300"></div>
+    <div class="border-t py-1 border-gray-300"></div>
 
     <!-- Нижняя панель -->
     <div class="bg-[#E8F4F2] flex-shrink-0 m-0 w-full">
       <!-- Если клавиатура открыта -->
       <div v-if="showKeyboard" class="p-2 pb-safe space-y-2">
         <!-- Поле ввода -->
-        <div class="flex gap-2 items-center">
+        <div class="flex gap-1 sm:gap-2 items-center">
         <input
           v-model="textInput"
           type="text"
@@ -162,8 +162,8 @@
             class="border rounded px-2 sm:px-3 py-1 sm:py-1.5 flex-1 text-xs sm:text-sm hover:bg-gray-100 focus:bg-white transition-colors duration-200"
           @keyup.enter="sendText"
         />
-          <div @click="sendText" class="bg-gray-200 hover:bg-gray-300 text-white p-1.5 sm:p-2 rounded-full cursor-pointer transition-all duration-300 transform hover:scale-105">
-            <img src="../assets/paper.svg" alt="send" class="w-5 h-5" />
+          <div @click="sendText" class="bg-gray-200 hover:bg-gray-300 text-white p-1 sm:p-1.5 md:p-2 rounded-full cursor-pointer transition-all duration-300 transform hover:scale-105">
+            <img src="../assets/paper.svg" alt="send" class="w-4 h-4 sm:w-5 sm:h-5" />
           </div>
         </div>
 
@@ -224,24 +224,37 @@
       
         
         <!-- Большая кнопка "Спросить голосом" по центру -->
-        <div class="flex justify-center mb-4 bg-white">
-          <div
+        <div class="flex justify-center mb-2 sm:mb-4 bg-white px-2">
+          <div v-if="!isRecording"
             @click="toggleRecording"
-            :class="[
-              'px-4 sm:px-6 lg:px-8 py-2 sm:py-3 lg:py-4 my-2 rounded-full font-medium flex items-center justify-center gap-2 sm:gap-3 max-w-fit cursor-pointer transition-all duration-200 ',
-              isRecording 
-                ? 'bg-red-500 border-2 border-red-500 text-white hover:bg-red-600' 
-                : 'bg-green-900 text-white hover:bg-green-800'
-            ]"
+            class="px-3 sm:px-4 md:px-6 lg:px-8 py-2 sm:py-3 lg:py-4 my-1 sm:my-2 rounded-full font-medium flex items-center justify-center gap-2 sm:gap-3 max-w-fit cursor-pointer transition-all duration-200 bg-green-900 text-white hover:bg-green-800"
           >
             <img
-              v-if="!isRecording"
               src="../assets/micro.svg"
               alt="microphone"
-              class="w-4 h-4 sm:w-5 sm:h-5 lg:w-6 lg:h-6"
+              class="w-3 h-3 sm:w-4 sm:h-4 md:w-5 md:h-5 lg:w-6 lg:h-6"
             />
-            <span v-if="isRecording" class="text-lg text-white">⏹</span>
-            <span v-if="!isRecording" class="text-base sm:text-lg lg:text-xl font-semibold">Спросить голосом</span>
+            <span class="text-sm sm:text-base md:text-lg lg:text-xl font-semibold">Спросить голосом</span>
+          </div>
+          
+          <!-- Блок для записи: кнопка Стоп в центре + описание справа -->
+          <div v-if="isRecording" class="flex items-center justify-center relative w-full mb-2">
+            <!-- Кнопка Стоп в центре -->
+            <div
+              @click="toggleRecording"
+              class="px-4 sm:px-6 lg:px-8 py-2 sm:py-3 lg:py-4 my-2 rounded-full font-medium flex items-center justify-center gap-2 sm:gap-3 max-w-fit cursor-pointer transition-all duration-200 bg-red-500 border-2 border-red-500 text-white hover:bg-red-600"
+            >
+              <span class="text-lg text-white">⏹</span>
+            
+            </div>
+            
+            <!-- Описание справа от кнопки -->
+            <div class="absolute rounded-md ml-6 left-1/2 transform translate-x-4 flex items-center gap-2 text-center p-2 bg-[#EBEBEB] text-[#8C8C8C] text-xs">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5 3 12m0 0 7.5-7.5M3 12h18" />
+              </svg>
+              <span>Чтобы завершить <br/> сессию и запись, <br/> нажмите на кнопку Стоп</span>
+            </div>
           </div>
         </div>
         
@@ -249,9 +262,9 @@
       
         
         <!-- Кнопки управления внизу -->
-        <div class="flex justify-between items-center mb-3 mx-2">
-          <div @click="goToHome" class="px-3 sm:px-4 py-1.5 sm:py-2 rounded-[16px] sm:rounded-[20px] bg-white border-2 border-[#11AE78] text-[#11AE78] font-medium cursor-pointer text-sm sm:text-base hover:bg-green-50 transition-all duration-300">Закрыть х</div>
-          <div @click="openKeyboard" class="px-3 sm:px-4 py-1.5 sm:py-2 rounded-[16px] sm:rounded-[20px] bg-white border-2 border-[#11AE78] text-[#11AE78] font-medium cursor-pointer text-sm sm:text-base hover:bg-green-50 transition-all duration-300">Открыть клавиатуру</div>
+        <div class="flex justify-between items-center mb-2 sm:mb-3 mx-1 sm:mx-2 gap-2">
+          <div @click="goToHome" class="px-2 sm:px-3 md:px-4 py-1 sm:py-1.5 md:py-2 rounded-[12px] sm:rounded-[16px] md:rounded-[20px] bg-white border-2 border-[#11AE78] text-[#11AE78] font-medium cursor-pointer text-xs sm:text-sm md:text-base hover:bg-green-50 transition-all duration-300 flex-1 text-center">Закрыть х</div>
+          <div @click="openKeyboard" class="px-2 sm:px-3 md:px-4 py-1 sm:py-1.5 md:py-2 rounded-[12px] sm:rounded-[16px] md:rounded-[20px] bg-white border-2 border-[#11AE78] text-[#11AE78] font-medium cursor-pointer text-xs sm:text-sm md:text-base hover:bg-green-50 transition-all duration-300 flex-1 text-center">Открыть клавиатуру</div>
         </div>
       </div>
     </div>
@@ -1658,16 +1671,23 @@ onBeforeUnmount(() => {
 .keyboard-actions { padding: 0 4px; }
 
 /* Адаптив: уменьшаем минимальную ширину и высоту на маленьких экранах */
+@media (max-width: 640px) {
+  .kbd-row { grid-auto-columns: minmax(32px, 1fr); gap: 6px; }
+  .kbd-btn { min-height: 38px; font-size: 13px; padding: 6px 4px; border-radius: 8px; }
+  .kbd-enter { font-size: 13px; }
+  .small-mic { width: 32px; height: 32px; }
+}
+
 @media (max-width: 480px) {
-  .kbd-row { grid-auto-columns: minmax(30px, 1fr); gap: 6px; }
-  .kbd-btn { min-height: 40px; font-size: 14px; padding: 6px 4px; border-radius: 8px; }
-  .kbd-enter { font-size: 14px; }
-  .small-mic { width: 34px; height: 34px; }
+  .kbd-row { grid-auto-columns: minmax(28px, 1fr); gap: 4px; }
+  .kbd-btn { min-height: 36px; font-size: 12px; padding: 5px 3px; border-radius: 6px; }
+  .kbd-enter { font-size: 12px; }
+  .small-mic { width: 30px; height: 30px; }
 }
 
 @media (max-width: 360px) {
-  .kbd-row { grid-auto-columns: minmax(26px, 1fr); gap: 5px; }
-  .kbd-btn { min-height: 36px; font-size: 13px; padding: 5px 3px; border-radius: 6px; }
+  .kbd-row { grid-auto-columns: minmax(24px, 1fr); gap: 3px; }
+  .kbd-btn { min-height: 32px; font-size: 11px; padding: 4px 2px; border-radius: 4px; }
   .kbd-space { flex: 3; }
 }
 

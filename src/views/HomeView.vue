@@ -239,9 +239,9 @@ const selectService = (service: string) => {
     setTimeout(() => {
       router.push("/service");
     }, 100);
-    
-    // Оставляем видео скрытым навсегда для этой сессии
-    // isAnimating остается true, чтобы видео не появилось снова
+  }
+  else if (service === "help") {
+    router.push("/info-service");
   }
 };
 </script>

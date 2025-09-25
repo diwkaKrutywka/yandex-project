@@ -16,11 +16,9 @@
     <main class="flex-1 flex flex-col items-center justify-center px-4 py-2 sm:py-4 bg-white">
       <!-- Заголовки -->
       <div class="text-center mb-4 sm:mb-6">
-        <div class="text-[#11AE78] font-bold text-base sm:text-lg lg:text-xl xl:text-2xl mb-1 sm:mb-2">
-          №3 емханаға қош <br />келдіңіздер
+        <div class="text-[#11AE78] font-bold text-base sm:text-lg lg:text-xl xl:text-2xl mb-1 sm:mb-2" v-html="$t('welcome_kazakh')">
         </div>
-        <div class="text-green-700 font-bold text-base sm:text-lg lg:text-xl xl:text-2xl mb-1 sm:mb-2">
-          Добро пожаловать  <br /> в поликлинику
+        <div class="text-green-700 font-bold text-base sm:text-lg lg:text-xl xl:text-2xl mb-1 sm:mb-2" v-html="$t('welcome_russian')">
         </div>
       </div>
 
@@ -39,9 +37,7 @@
 
       <!-- Кнопки выбора языка -->
       <div class="font-semibold mb-3 sm:mb-4 text-xs sm:text-sm lg:text-base flex items-center"> 
-        Тілді таңдаңыз 
-        <div class="mx-1 sm:mx-2 flex items-center justify-center">•</div> 
-        Выберите язык
+        {{ $t('select_language') }}
       </div>
       <div class="flex  sm:flex-row gap-4 sm:gap-6">
        
@@ -49,13 +45,13 @@
           @click="selectLanguage('kk')"
           class="bg-[#0C593E] hover:bg-[#0A4A33] text-white w-28 sm:w-32 lg:w-36 xl:w-40 font-bold py-2 sm:py-3 lg:py-4 px-4 sm:px-6 lg:px-8 xl:px-10 rounded-full text-sm sm:text-base lg:text-lg xl:text-xl cursor-pointer flex items-center justify-center text-center transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl"
         >
-          Қазақ
+          {{ $t('language_kazakh') }}
         </div>
         <div 
           @click="selectLanguage('ru')"
           class="bg-[#0C593E] hover:bg-[#0A4A33] text-white w-28 sm:w-32 lg:w-36 xl:w-40 font-bold py-2 sm:py-3 lg:py-4 px-4 sm:px-6 lg:px-8 xl:px-10 rounded-full text-sm sm:text-base lg:text-lg xl:text-xl cursor-pointer flex items-center justify-center text-center transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl"
         >
-          Русский
+          {{ $t('language_russian') }}
         </div>
       </div>
     </main>
