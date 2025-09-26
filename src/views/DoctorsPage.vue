@@ -42,10 +42,7 @@
           {{ isSearchMode ? `Результаты поиска: "${searchQuery}"` : (doctors[0]?.specialty || 'Врачи') }}
         </div>
         
-        <!-- Отладочная информация -->
-        <div v-if="isSearchMode" class="text-sm text-gray-600 mb-2">
-          Режим поиска: {{ isSearchMode }}, Результатов: {{ searchResults.length }}
-        </div>
+       
 
         <!-- Таб меню -->
         <a-tabs v-model:activeKey="activeTab" class="custom-tabs bg-white p-3 rounded shadow mt-4 flex-1">

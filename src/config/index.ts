@@ -1,5 +1,6 @@
 function getBaseUrl() {
-   return 'http://185.146.3.18:8000/api/v1/'
+  //  return 'http://185.146.3.18:8000/api/v1/'
+  return 'https://genai.bpcontact.kz/api/v1/'
   }
   
   const baseUrl = {
