@@ -15,11 +15,9 @@
     <main class="flex-1 flex flex-col items-center justify-center px-4 py-2 sm:py-4 bg-white">
       <!-- Заголовки -->
       <div class="text-center mb-4 sm:mb-6">
-        <div class="text-[#11AE78] font-bold text-base sm:text-lg lg:text-xl xl:text-2xl mb-1 sm:mb-2">
-          ӨЗІНЕ-ӨЗІ ҚЫЗМЕТ<br /> КӨРСЕТУ ТЕРМИНАЛЫ
+        <div class="text-[#11AE78] font-bold text-base sm:text-lg lg:text-xl xl:text-2xl mb-1 sm:mb-2" v-html="$t('self_service_terminal_kz')">
         </div>
-        <div class="text-green-700 font-bold text-base sm:text-lg lg:text-xl xl:text-2xl mb-1 sm:mb-2">
-          ТЕРМИНАЛ <br /> САМООБСЛУЖИВАНИЯ
+        <div class="text-green-700 font-bold text-base sm:text-lg lg:text-xl xl:text-2xl mb-1 sm:mb-2" v-html="$t('self_service_terminal_ru')">
         </div>
       </div>
 
@@ -41,7 +39,7 @@
       <div
         @click="startService"
         class="bg-[#0C593E] hover:bg-[#0A4A33] text-white font-bold py-2 sm:py-3 lg:py-4 px-8 sm:px-14 lg:px-16 xl:px-20 rounded-full mt-4 text-sm sm:text-base lg:text-lg xl:text-xl cursor-pointer transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl">
-        Бастау  |  Начать
+        {{ $t('start_button') }}
       </div>
     </main>
 

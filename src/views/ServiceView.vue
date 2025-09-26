@@ -36,7 +36,7 @@
       >
         <!-- Заголовок отделений - фиксированный -->
         <div class="p-4 flex-shrink-0">
-          <p class="text-black font-bold text-xl mb-4">Отделения</p>
+          <p class="text-black font-bold text-xl mb-4">{{ $t('departments') }}</p>
         </div>
 
         <!-- Контент с прокруткой -->
@@ -55,7 +55,7 @@
               @click="loadSpecialties"
               class="mt-2 px-4 py-2 bg-[#11AE78] text-white rounded-lg hover:bg-[#0E9A6A] transition-colors"
             >
-              Попробовать снова
+              {{ $t('try_again') }}
             </button>
           </div>
 
@@ -65,7 +65,7 @@
               v-for="(specialty, index) in specialties"
               :key="specialty.id"
               @click="selectSpecialty(specialty.id)"
-              class="specialty-button w-full flex justify-between items-center bg-gradient-to-r from-[#14865E] to-[#11AE78] hover:from-[#117A52] hover:to-[#0E9A6A] text-white font-medium py-4 px-6 rounded-2xl text-sm transition-all duration-300 transform hover:scale-[1.02] shadow-md hover:shadow-lg"
+              class="specialty-button w-full flex justify-between items-center bg-gradient-to-r from-[#14865E] to-[#11AE78] hover:from-[#117A52] hover:to-[#0E9A6A] text-white font-medium py-4 px-6 rounded-2xl text-base sm:text-lg lg:text-xl transition-all duration-300 transform hover:scale-[1.02] shadow-md hover:shadow-lg"
               :class="{ 'animate-specialty': showSpecialties }"
               :style="{
                 animationDelay: showSpecialties ? `${index * 150}ms` : '0ms',
@@ -102,7 +102,9 @@ import AnimatedVideo from "../components/AnimatedVideo.vue";
 import { useDateTime } from "../composables/useDateTime";
 import { useRouter } from "vue-router";
 import CheckIin from "./CheckIin.vue";
+import { useI18n } from "vue-i18n";
 const router = useRouter();
+const { t } = useI18n();
 
 // Интерфейс для специальности
 interface Specialty {
@@ -169,33 +171,33 @@ const loadSpecialties = async () => {
     // Для демонстрации добавляем тестовые данные при ошибке
     console.log("📝 Загружаем тестовые специальности...");
     specialties.value = [
-      { id: 1, name: "Терапия", description: "Общие терапевтические услуги" },
+      { id: 1, name: t('specialties.therapy'), description: t('specialty_descriptions.therapy') },
       {
         id: 2,
-        name: "Кардиология",
-        description: "Лечение сердечно-сосудистых заболеваний",
+        name: t('specialties.cardiology'),
+        description: t('specialty_descriptions.cardiology'),
       },
       {
         id: 3,
-        name: "Неврология",
-        description: "Лечение заболеваний нервной системы",
+        name: t('specialties.neurology'),
+        description: t('specialty_descriptions.neurology'),
       },
-      { id: 4, name: "Педиатрия", description: "Детская медицина" },
-      { id: 5, name: "Хирургия", description: "Хирургические операции" },
-      { id: 6, name: "Гинекология", description: "Женское здоровье" },
-      { id: 7, name: "Офтальмология", description: "Лечение заболеваний глаз" },
-      { id: 8, name: "Отоларингология", description: "ЛОР-заболевания" },
-      { id: 9, name: "Дерматология", description: "Кожные заболевания" },
-      { id: 10, name: "Эндокринология", description: "Гормональные нарушения" },
+      { id: 4, name: t('specialties.pediatrics'), description: t('specialty_descriptions.pediatrics') },
+      { id: 5, name: t('specialties.surgery'), description: t('specialty_descriptions.surgery') },
+      { id: 6, name: t('specialties.gynecology'), description: t('specialty_descriptions.gynecology') },
+      { id: 7, name: t('specialties.ophthalmology'), description: t('specialty_descriptions.ophthalmology') },
+      { id: 8, name: t('specialties.otolaryngology'), description: t('specialty_descriptions.otolaryngology') },
+      { id: 9, name: t('specialties.dermatology'), description: t('specialty_descriptions.dermatology') },
+      { id: 10, name: t('specialties.endocrinology'), description: t('specialty_descriptions.endocrinology') },
       {
         id: 11,
-        name: "Ортопедия",
-        description: "Заболевания опорно-двигательного аппарата",
+        name: t('specialties.orthopedics'),
+        description: t('specialty_descriptions.orthopedics'),
       },
       {
         id: 12,
-        name: "Урология",
-        description: "Заболевания мочеполовой системы",
+        name: t('specialties.urology'),
+        description: t('specialty_descriptions.urology'),
       },
     ];
     console.log("✅ Тестовые специальности загружены");

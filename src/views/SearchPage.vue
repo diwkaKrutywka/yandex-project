@@ -36,7 +36,7 @@
       <div class="flex flex-col items-center justify-center pb-6 min-h-200px">
         <img src="../assets/search.svg" alt="search" class="w-32 h-32 sm:w-36 sm:h-36 lg:w-40 lg:h-40 xl:w-44 xl:h-44" />
         <p class="text-2xl sm:text-2xl lg:text-2xl xl:text-2xl font-bold">{{ searchQuery || '' }}</p>
-        <p v-if="!searchQuery" class="text-md sm:text-lg lg:text-xl xl:text-2xl font-bold ">Введите фамилию <br/> врача или название услуги...</p>
+        <p v-if="!searchQuery" class="text-md sm:text-lg lg:text-xl xl:text-2xl font-bold text-center px-4 text-gray-600" v-html="$t('search_placeholder_text')"></p>
       </div>
 
       <!-- Поле поиска -->
@@ -45,11 +45,10 @@
       <!-- Виртуальная клавиатура (всегда открыта) -->
       <div class="bg-[#E8F4F2] p-2 pb-safe space-y-2 flex-1 mt-26">
         <div class=" my-6">
-        <div class="relative">
+        <div class="relative max-w-md mx-auto">
           <input
             v-model="searchQuery"
             type="text"
-            placeholder="Введите фамилию врача или название услуги..."
             :disabled="isLoading"
             class="w-full px-4 py-3 pl-12 pr-12 text-sm sm:text-base border-2 border-[#11AE78] bg-white rounded-xl focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent disabled:opacity-50 disabled:cursor-not-allowed"
             @focus="openKeyboard"
@@ -399,4 +398,16 @@ onMounted(() => {
     background: linear-gradient(180deg, #f3f4f6 0%, #e5e7eb 100%);
   }
 }
+
+
+/* Стили для вводимого текста */
+input {
+  color: #000000 !important;
+  font-weight: bold !important;
+}
+
+input:focus {
+  color: #000000 !important;
+}
+
 </style>

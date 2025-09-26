@@ -11,10 +11,10 @@
 
         <!-- Поле перехода на авторизацию -->
         <div
-          class="w-full max-w-xs mx-auto py-2 px-8 bg-[#E0E0E0] rounded-xl mt-4 cursor-pointer"
+          class="w-full max-w-xs mx-auto py-3 px-8 bg-gray-200 rounded-xl mt-4 cursor-pointer"
           @click="openAuthPage"
         >
-          <span class="text-black text-md lg:text-base mb-2 font-bold">
+          <span class="text-black text-lg lg:text-xl mb-2 font-bold">
             {{ $t('iin_label') }}
           </span>
         </div>
@@ -26,9 +26,11 @@
           {{ $t('appointment_title') }} <br />
         </span>
 
-        <span class="text-black text-sm lg:text-base mb-4 font-semibold my-6">
-          {{ $t('iin_value') }} {{ iin }}
-        </span>
+        <div class="py-3 px-6 mb-4">
+          <span class="text-black text-lg lg:text-xl font-bold">
+            {{ $t('iin_value') }} {{ iin }}
+          </span>
+        </div>
 
         <!-- В реальном приложении эти данные можно будет грузить по API -->
         <div class="mt-2 text-gray-800">
@@ -37,7 +39,7 @@
         </div>
 
         <div
-          class="mt-4 bg-[#0C593E] text-white px-6 py-2 rounded-3xl shadow hover:bg-green-900 max-w-xs mx-auto"
+          class="mt-4 bg-[#0C593E] text-white px-6 py-3 rounded-3xl shadow-lg hover:bg-[#0A4A32] max-w-xs mx-auto font-bold text-base transition-all duration-200 hover:shadow-xl"
         >
           {{ $t('book_therapist') }}
         </div>
