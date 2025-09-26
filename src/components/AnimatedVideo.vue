@@ -14,9 +14,10 @@
       }"
     >
       <video
+        ref="videoElement"
         src="../assets/idle.mp4"
         autoplay
-        muted
+        :muted="!isSoundEnabled"
         loop
         :class="position === 'top-right' ? 'object-cover' : 'w-full h-full object-cover'"
         :style="position === 'top-right' ? 'width: 105%; height: 105%; margin: -2.5% 0 0 -2.5%; object-fit: cover; object-position: center; filter: contrast(1.1) brightness(1.05) saturate(1.1) sharpen(0.5);' : 'object-fit: cover; object-position: center; filter: contrast(1.1) brightness(1.05) saturate(1.1) sharpen(0.5);'"
@@ -26,11 +27,32 @@
 </template>
 
 <script setup lang="ts">
+import { ref, onMounted, watch } from 'vue'
+import { useSoundControl } from '../composables/useSoundControl'
+
 interface Props {
   position: 'center' | 'top-right'
 }
 
 defineProps<Props>()
+
+const { isSoundEnabled } = useSoundControl()
+const videoElement = ref<HTMLVideoElement>()
+
+// Следим за изменениями состояния звука и обновляем видео
+watch(isSoundEnabled, (newValue) => {
+  if (videoElement.value) {
+    videoElement.value.muted = !newValue
+    console.log('🎥 Видео звук обновлен:', newValue ? 'включен' : 'выключен')
+  }
+})
+
+onMounted(() => {
+  if (videoElement.value) {
+    videoElement.value.muted = !isSoundEnabled.value
+    console.log('🎥 Видео инициализировано с звуком:', isSoundEnabled.value ? 'включен' : 'выключен')
+  }
+})
 </script>
 
 <style scoped>

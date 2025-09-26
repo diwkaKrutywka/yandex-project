@@ -34,8 +34,8 @@
         </div>
         
         <img src="../assets/med-icon.svg" alt="med-icon" class="w-40 sm:w-52 lg:w-60 h-12 sm:h-14 lg:h-16" />
-        
-        <div class="text-center text-sm sm:text-base lg:text-lg font-bold text-black-800 leading-tight my-3 sm:my-4">
+        <img src="../assets/yandex.svg" alt="dost" class="w-40 sm:w-52 lg:w-60 h-12 sm:h-14 lg:h-16 my-2" />
+        <div class="text-center text-sm sm:text-base lg:text-lg font-bold  leading-tight my-3 sm:my-4">
           Чтобы узнать как заказать <br/> такой терминал, <br/> отсканируйте QR-код
         </div>
         

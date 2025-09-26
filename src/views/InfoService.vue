@@ -9,21 +9,13 @@
       </div>
     
     </nav>
+    <!-- Видео в правом верху (скрыто во время глобальной анимации) -->
     <div
-      class="fixed z-50"
+      class="info-video-container fixed z-50"
+      :class="{ 'hidden-during-animation': isGlobalAnimating }"
       :style="{ top: '0.5rem', right: '1rem' }"
     >
-      <div class="w-[calc(5rem+10px)] h-[calc(5rem+10px)] sm:w-[calc(6rem+10px)] sm:h-[calc(6rem+10px)] lg:w-[calc(7rem+10px)] lg:h-[calc(7rem+10px)] rounded-full border-2 border-[#C5E6DC] overflow-hidden shadow-lg bg-white video-glow">
-        <video 
-          autoplay 
-          muted 
-          loop 
-          class="object-cover"
-          style="width: 105%; height: 105%; margin: -2.5% 0 0 -2.5%; object-fit: cover; object-position: center; filter: contrast(1.1) brightness(1.05) saturate(1.1) sharpen(0.5);"
-        >
-          <source src="/src/assets/idle.mp4" type="video/mp4">
-        </video>
-      </div>
+      <AnimatedVideo position="top-right" />
     </div>
     <!-- Основной контент -->
     <main class="flex-1 flex flex-col bg-white px-2 sm:px-4 py-4 sm:py-6 overflow-y-auto">
@@ -92,7 +84,7 @@
 
 
 
-      <FooterNav :showHomeButton="true" />
+      <FooterNav :showHomeButton="true" :showBackButton="true" />
     </div>
   </div>
 </template>
@@ -101,11 +93,16 @@
 import { useDateTime } from "../composables/useDateTime";
 import { useRouter } from "vue-router";
 import FooterNav from "../components/FooterNav.vue";
+import AnimatedVideo from "../components/AnimatedVideo.vue";
 import { useI18n } from "vue-i18n";
+import { ref, onMounted } from "vue";
 
 const { currentDate, currentTime } = useDateTime();
 const router = useRouter();
 const { t: $t } = useI18n();
+
+// Состояние глобальной анимации
+const isGlobalAnimating = ref(true); // Начинаем со скрытого состояния
 
 // Данные услуг
 const services = [
@@ -138,6 +135,32 @@ const selectService = (serviceId: string) => {
   }
 };
 
+// Показываем локальное видео после исчезновения глобального
+onMounted(() => {
+  setTimeout(() => {
+    isGlobalAnimating.value = false;
+  }, 1200); // Появляется почти одновременно с исчезновением глобального
+
+  // Дополнительная гарантия скрытия глобального видео
+  setTimeout(() => {
+    (window as any).forceHideGlobalVideo?.();
+  }, 1400); // Двойная гарантия
+});
+
 </script>
 
-<style scoped></style>
+<style scoped>
+.hidden-during-animation {
+  opacity: 0;
+  visibility: hidden;
+}
+
+.info-video-container {
+  transition: opacity 0.1s ease-in-out, visibility 0.1s ease-in-out;
+}
+
+.info-video-container:not(.hidden-during-animation) {
+  opacity: 1;
+  visibility: visible;
+}
+</style>

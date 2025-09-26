@@ -49,6 +49,11 @@ const routes: RouteRecordRaw[] = [
       name: "InfoDetails",
       component: () => import("../views/InfoDetails.vue"),
     },
+    {
+      path: "/search",
+      name: "SearchPage",
+      component: () => import("../views/SearchPage.vue"),
+    },
 ];
 
 const router = createRouter({

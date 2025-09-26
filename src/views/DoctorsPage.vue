@@ -39,7 +39,12 @@
       <CheckIin />
       <div class="flex-1 bg-[#E8F4F2] flex flex-col mt-2 rounded-t-xl">
         <div class="text-black font-bold text-xl my-4">
-          {{ doctors[0]?.specialty }}
+          {{ isSearchMode ? `Результаты поиска: "${searchQuery}"` : (doctors[0]?.specialty || 'Врачи') }}
+        </div>
+        
+        <!-- Отладочная информация -->
+        <div v-if="isSearchMode" class="text-sm text-gray-600 mb-2">
+          Режим поиска: {{ isSearchMode }}, Результатов: {{ searchResults.length }}
         </div>
 
         <!-- Таб меню -->
@@ -48,10 +53,10 @@
           <a-tab-pane key="osms" tab=" Услуга по ОСМС ">
             <div class="table-container">
               <a-table
-                :columns="columnsOSMS"
-                :data-source="doctors"
+                :columns="isSearchMode ? columnsSearchOSMS : columnsOSMS"
+                :data-source="isSearchMode ? searchResults : doctors"
                 :loading="loading"
-                row-key="id"
+                :row-key="isSearchMode ? 'doctor_id' : 'id'"
                 bordered
                 :pagination="false"
                 :rowClassName="rowClassName"
@@ -59,12 +64,14 @@
               <template #bodyCell="{ column, record }">
                 <template v-if="column.key === 'action'">
                   <div>
-                    <div class="schedule-text">
+                  
+                    <!-- Для обычных врачей показываем расписание -->
+                    <div v-if="record.schedule_string" class="schedule-text">
                       <div v-for="(schedule, index) in record.schedule_string.split(';')" :key="index" class="schedule-item">
                         {{ schedule.trim() }}
                       </div>
                     </div>
-                    <div  class="border-2 border-[#11AE78] rounded-full px-4 py-2 text-[#11AE78] font-bold w-fit" @click="openScheduleModal(record)">
+                    <div class="border-2 border-[#11AE78] rounded-full px-4 py-2 text-[#11AE78] font-bold w-fit cursor-pointer" @click="openScheduleModal(record)">
                       Записаться
                     </div>
                   </div>
@@ -199,6 +206,7 @@ import { ref, onMounted } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { useDateTime } from "../composables/useDateTime";
 import { DoctorsApi, type Doctor } from "../api/doctors";
+import { type SearchDoctor } from "../api/search";
 import FooterNav from "../components/FooterNav.vue";
 import CheckIin from "./CheckIin.vue";
 import SchedulePage from "../components/SchedulePage.vue";
@@ -216,6 +224,13 @@ const specialityId = ref<string | null>(
   (route.query.speciality_id as string) || null
 );
 
+// Search results handling
+const searchQuery = ref<string | null>(
+  (route.query.search as string) || null
+);
+const searchResults = ref<SearchDoctor[]>([]);
+const isSearchMode = ref(false);
+
 const loading = ref(false);
 const visible = ref(false);
 const doctor = ref<Doctor | null>(null);
@@ -232,6 +247,16 @@ const columnsOSMS = [
   { title: "Кабинет", dataIndex: "cabinet", key: "cabinet" , width: "20%" },
   { title: "Часы работы", key: "action" },
 ];
+
+// Колонки для результатов поиска (адаптированные под формат ОСМС)
+const columnsSearchOSMS = [
+  { title: "ФИО врача", dataIndex: "full_name", key: "full_name", width: "20%" },
+  { title: "Специальность", dataIndex: "specialty", key: "specialty" , width: "20%" },
+  { title: "Клиника", dataIndex: "clinic_name", key: "clinic_name" , width: "20%" },
+  { title: "Кабинет", dataIndex: "cabinet", key: "cabinet" , width: "20%" },
+  { title: "Записаться", key: "action" },
+];
+
 
 // Колонки для платных услуг
 const columnsPaid = [
@@ -336,7 +361,24 @@ function rowClassName(_: any, index: number) {
 
 // Загрузка данных ОСМС
 onMounted(async () => {
-  fetchDoctors();
+  console.log('🔍 DoctorsPage onMounted - route.query:', route.query);
+  
+  // Проверяем, есть ли результаты поиска
+  if (route.query.results) {
+    try {
+      searchResults.value = JSON.parse(route.query.results as string);
+      isSearchMode.value = true;
+      console.log('✅ Загружены результаты поиска:', searchResults.value);
+      console.log('✅ Количество результатов:', searchResults.value.length);
+    } catch (error) {
+      console.error('❌ Ошибка при парсинге результатов поиска:', error);
+      // Если не удалось распарсить результаты, загружаем обычных врачей
+      fetchDoctors();
+    }
+  } else {
+    console.log('📋 Нет результатов поиска, загружаем обычных врачей');
+    fetchDoctors();
+  }
 });
 async function fetchDoctors() {
   if (!specialityId.value) return;
@@ -359,7 +401,7 @@ async function fetchDoctors() {
     isLoading.value = false;
   }
 }
-function openScheduleModal(selectedDoctor: Doctor) {
+function openScheduleModal(selectedDoctor: Doctor | SearchDoctor) {
   console.log('🎯 openScheduleModal вызван с доктором:', selectedDoctor);
   
   // Проверяем наличие ИИН
@@ -368,7 +410,22 @@ function openScheduleModal(selectedDoctor: Doctor) {
     return;
   }
   
-  doctor.value = selectedDoctor;
+  // Если это результат поиска, преобразуем его в формат Doctor
+  if (isSearchMode.value && 'clinic_name' in selectedDoctor) {
+    const searchDoctor = selectedDoctor as SearchDoctor;
+    doctor.value = {
+      id: searchDoctor.doctor_id.toString(),
+      doctor_id: searchDoctor.doctor_id.toString(),
+      full_name: searchDoctor.full_name,
+      specialty: searchDoctor.specialty,
+      cabinet: searchDoctor.cabinet,
+      schedule_string: searchDoctor.schedule_string || "По записи",
+      type: 'oms' as const
+    };
+  } else {
+    doctor.value = selectedDoctor as Doctor;
+  }
+  
   isPaidService.value = false;
   selectedPaidService.value = null;
   visible.value = true;
@@ -404,9 +461,12 @@ function openScheduleModalForPaid(service: any) {
 
 function handleAppointmentBooked(appointmentInfo: any) {
   console.log('🎉 Запись подтверждена, показываем ApprovePage', appointmentInfo);
+  console.log('🔍 DoctorsPage: appointmentResult из события:', appointmentInfo.appointmentResult);
   appointmentResult.value = appointmentInfo.appointmentResult;
   console.log('🔍 DoctorsPage: appointmentResult установлен:', appointmentResult.value);
+  console.log('🔍 DoctorsPage: showApprovePage будет установлен в true');
   showApprovePage.value = true;
+  console.log('🔍 DoctorsPage: showApprovePage установлен:', showApprovePage.value);
 }
 
 function closeApprovePage() {

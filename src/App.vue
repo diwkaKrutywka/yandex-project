@@ -70,7 +70,7 @@ onUnmounted(() => {
 
 // Отслеживаем изменения маршрута
 watch(route, (newRoute) => {
-  if (newRoute.name === 'ServiceView' && isVideoTransitioning.value) {
+  if ((newRoute.name === 'ServiceView' || newRoute.name === 'SearchPage' || newRoute.name === 'InfoService') && isVideoTransitioning.value) {
     // ПРИНУДИТЕЛЬНО скрываем глобальное видео сразу после анимации
     setTimeout(() => {
       showGlobalVideo.value = false

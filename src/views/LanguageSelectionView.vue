@@ -26,9 +26,9 @@
       <div class="mb-4 sm:mb-6">
         <div class="w-40 h-40 sm:w-54 sm:h-54 lg:w-64 lg:h-64 xl:w-76 xl:h-76 rounded-full border-2 sm:border-4 border-[#E8F4F2] overflow-hidden shadow-lg bg-white video-glow">
           <video 
-            src="../assets/idle.mp4" 
+            src="../assets/video/language_ru.mp4" 
             autoplay 
-            muted 
+            :muted="!isSoundEnabled"
             loop 
             class="w-full h-full object-cover"
           ></video>
@@ -57,11 +57,7 @@
     </main>
 
     <!-- Нижняя навигация -->
-    <nav class="bg-[#E8F4F2] h-16 sm:h-16 lg:h-20 flex items-center justify-center shadow-sm w-full">
-      <div class="text-green-600 text-[10px] sm:text-xs lg:text-sm xl:text-base">
-       
-      </div>
-    </nav>
+    <FooterNav :showBackButton="false" :showQR="false" :showLanguageButton="false" />
   </div>
 </template>
 
@@ -69,7 +65,9 @@
 import { useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { useDateTime } from '../composables/useDateTime'
-
+import FooterNav from '../components/FooterNav.vue'
+import { useSoundControl } from '../composables/useSoundControl'
+const { isSoundEnabled } = useSoundControl()
 const router = useRouter()
 const { locale } = useI18n()
 

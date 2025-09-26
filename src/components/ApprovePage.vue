@@ -24,7 +24,7 @@
     <!-- Фиксированный футер -->
     <div class="flex justify-center bg-[#E8F4F2] mt-6">
       <div
-        class="border-2 border-[#11AE78] rounded-full px-4 py-2 text-[#11AE78] font-bold w-fit cursor-pointer text-center my-4 bg-white"
+        class="border-2 border-[#11AE78] text-[#11AE78] rounded-full px-4 py-2 font-bold w-fit cursor-pointer text-center my-4 bg-white"
         @click="handleConfirm"
       >
         Закрыть х
@@ -38,11 +38,14 @@ interface Props {
   appointmentResult?: any;
 }
 
-defineProps<Props>();
+const props = defineProps<Props>();
 
 const emit = defineEmits<{
   close: [];
 }>();
+
+// Отладочные логи
+console.log("🔍 ApprovePage: получен appointmentResult:", props.appointmentResult);
 
 const handleConfirm = () => {
   console.log("🔍 ApprovePage: закрываем модальное окно");

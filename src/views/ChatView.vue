@@ -24,14 +24,14 @@
         <video
           src="../assets/idle.mp4"
           autoplay
-          muted
+          :muted="!isSoundEnabled"
           loop
           class="w-[110%] h-[110%] rounded-full"
           style="margin: -5% 0 0 -5%; object-fit: cover; object-position: center; filter: contrast(1.2) brightness(1.15) saturate(1.2) sharpen(1.0); image-rendering: -webkit-optimize-contrast; image-rendering: crisp-edges;"
         ></video>
       </div>
         <div>
-        <div class="text-xs sm:text-sm md:text-base flex align-start">Алия</div>
+        <div class="text-xs sm:text-sm md:text-base flex align-start">Айгерим</div>
         <div class="text-xs sm:text-sm opacity-80 flex items-center gap-1">
           <div
             :class="[ 'w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full',
@@ -276,9 +276,13 @@ import { ref, onMounted, onUnmounted, onBeforeUnmount, nextTick, computed, watch
 import { useRouter } from "vue-router";
 import { useInactivityTimer } from "../composables/useInactivityTimer";
 import { useDateTime } from "../composables/useDateTime";
+import { useSoundControl } from "../composables/useSoundControl";
 
 // Ref для контейнера сообщений
 const messagesContainer = ref<HTMLElement | null>(null);
+
+// Управление звуком
+const { isSoundEnabled } = useSoundControl();
 
 // Функция автоскролла вниз
 const scrollToBottom = async () => {
@@ -1128,8 +1132,8 @@ const isRecording = ref(false);
 const layouts = {
   kazakh: {
     rows: [
-      ['й','ц','у','к','е','н','г','ш','щ'],
-      ['ф','ы','в','а','п','р','о','л','д'],
+      ['й','ц','у','к','е','н','г','ш','щ', 'х'],
+      ['ф','ы','в','а','п','р','о','л','д', 'з'],
       ['я','ч','с','м','и','т','ь','ң','⌫'],
       ['ү','қ','і','ғ','123',' ','↵']
     ],
@@ -1169,11 +1173,7 @@ const sendText = () => {
      const messageStr = JSON.stringify(message);
      
      console.group('📤 ОТПРАВКА ТЕКСТА В WEBSOCKET');
-     console.log('Тип сообщения:', message.type);
-     console.log('Текст:', textInput.value);
-     console.log('Размер JSON:', messageStr.length, 'символов');
-     console.log('Полное JSON сообщение:', messageStr);
-     console.log('Время:', new Date().toLocaleTimeString());
+     
      console.groupEnd();
      
      ws.value.send(messageStr);
@@ -1205,9 +1205,7 @@ const sendQuickReply = (option: string) => {
     const messageStr = JSON.stringify(message);
     
     console.group('📤 ОТПРАВКА БЫСТРОГО ОТВЕТА');
-    console.log('Тип сообщения:', message.type);
-    console.log('Текст:', option);
-    console.log('Время:', new Date().toLocaleTimeString());
+    
     console.groupEnd();
     
     ws.value.send(messageStr);
@@ -1450,6 +1448,14 @@ const onKey = (key: string) => {
    if (audioQueue.value.length === 0) {
      isPlayingAudio.value = false;
      console.log('🎵 Очередь пуста, воспроизведение завершено');
+     return;
+   }
+
+   // Проверяем, включен ли звук
+   if (!isSoundEnabled.value) {
+     console.log('🔇 Звук выключен, пропускаем воспроизведение');
+     audioQueue.value.shift(); // Убираем из очереди
+     playNextAudio(); // Переходим к следующему
      return;
    }
 
