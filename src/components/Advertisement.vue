@@ -84,8 +84,8 @@ const emit = defineEmits<{
 }>()
 
 // Таймер обратного отсчета
-const countdown = ref(5)
-const totalTime = 5
+const countdown = ref(10)
+const totalTime = 10
 let countdownInterval: number | null = null
 
 // Вычисляемые свойства для кругового прогресса
@@ -101,7 +101,7 @@ const closeModal = () => {
 }
 
 const startCountdown = () => {
-  countdown.value = 5
+  countdown.value = 10
   
   // Очищаем предыдущий таймер если есть
   if (countdownInterval) {

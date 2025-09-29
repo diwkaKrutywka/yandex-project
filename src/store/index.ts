@@ -8,6 +8,9 @@ export const useUserStore = defineStore('user', {
   actions: {
     setIin(value: string) {
       this.iin = value
+    },
+    clearIin() {
+      this.iin = ''
     }
   },
 })

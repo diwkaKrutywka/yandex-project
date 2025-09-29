@@ -63,11 +63,12 @@
                   <div>
                   
                     <!-- Для обычных врачей показываем расписание -->
-                    <div v-if="record.schedule_string" class="schedule-text">
+                    <!-- <div v-if="record.schedule_string" class="schedule-text">
                       <div v-for="(schedule, index) in record.schedule_string.split(';')" :key="index" class="schedule-item">
                         {{ schedule.trim() }}
                       </div>
-                    </div>
+                    </div> -->
+                    <span>пн. ср, пт 14:00-20:00 вт,<br/> чт 8:00-14:00</span>
                     <div class="border-2 border-[#11AE78] rounded-full px-4 py-2 text-[#11AE78] font-bold w-fit cursor-pointer" @click="openScheduleModal(record)">
                       Записаться
                     </div>
@@ -123,6 +124,7 @@
     <a-modal
       v-model:open="showApprovePage"
       width="500px"
+      rounded-lg
       centered
       :footer="null"
       :body-style="{ padding: '0px' }"
@@ -469,6 +471,13 @@ function handleAppointmentBooked(appointmentInfo: any) {
 function closeApprovePage() {
   showApprovePage.value = false;
   appointmentResult.value = null;
+  // Если ИИН очищен (автоматическое перенаправление), закрываем модалку расписания
+  if (!userStore.iin) {
+    visible.value = false;
+    doctor.value = null;
+    isPaidService.value = false;
+    selectedPaidService.value = null;
+  }
 }
 
 function openDescriptionModal(service: any) {
