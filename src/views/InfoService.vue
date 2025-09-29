@@ -130,7 +130,7 @@ const selectService = (serviceId: string) => {
     case 'payment':
     case 'results':
       // Показываем демо-сообщение
-      alert(`Информация о разделе "${services.find(s => s.id === serviceId)?.name}" будет доступна в полной версии приложения`);
+      console.log(`Информация о разделе "${services.find(s => s.id === serviceId)?.name}" будет доступна в полной версии приложения`);
       break;
   }
 };

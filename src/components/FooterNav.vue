@@ -119,7 +119,7 @@
           @click="toggleLanguage"
         >
           <span class="text-[#14865E] text-sm font-bold">
-            {{ currentLanguage === "kk" ? $t("language_kaz") : $t("language_rus") }}
+            {{ currentLanguage === "kk" ? $t("language_rus") : $t("language_kaz") }}
           </span>
         </div>
 
@@ -132,6 +132,13 @@
         </div>
       </div>
     </div>
+    
+    <!-- Модалка StaticAd -->
+    <StaticAd 
+      v-if="showStaticAd"
+      :isVisible="showStaticAd" 
+      @close="closeStaticAd" 
+    />
   </div>
 </template>
 
@@ -140,6 +147,7 @@ import { ref, onMounted } from "vue";
 import { useRouter } from "vue-router";
 import { useI18n } from "vue-i18n";
 import { useSoundControl } from "../composables/useSoundControl";
+import StaticAd from "./StaticAd.vue";
 
 interface Props {
   showHomeButton?: boolean;
@@ -163,6 +171,8 @@ const router = useRouter();
 const { locale } = useI18n();
 const { toggleSound, soundIcon, soundIconClass } = useSoundControl();
 
+// Состояние для модалки StaticAd
+const showStaticAd = ref(false);
 
 const currentLanguage = ref(locale.value);
 
@@ -219,7 +229,13 @@ const toggleLanguage = () => {
 };
 
 const handleQRClick = () => {
-  alert("QR-код функциональность будет добавлена позже");
+ console.log('🔍 QR клик - открываем модалку StaticAd');
+ showStaticAd.value = true;
+ console.log('🔍 showStaticAd.value:', showStaticAd.value);
+};
+
+const closeStaticAd = () => {
+ showStaticAd.value = false;
 };
 </script>
 

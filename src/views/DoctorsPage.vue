@@ -404,7 +404,7 @@ function openScheduleModal(selectedDoctor: Doctor | SearchDoctor) {
   console.log('🎯 openScheduleModal вызван с доктором:', selectedDoctor);
   
   // Проверяем наличие ИИН
-  if (!userStore.iin) {
+  if (!userStore.iin || userStore.iin.length !== 12) {
     router.push("/auth-page");
     return;
   }
@@ -436,7 +436,7 @@ function openScheduleModalForPaid(service: any) {
   console.log('🎯 openScheduleModalForPaid вызван с услугой:', service);
   
   // Проверяем наличие ИИН
-  if (!userStore.iin) {
+  if (!userStore.iin || userStore.iin.length !== 12) {
     router.push("/auth-page");
     return;
   }
@@ -472,7 +472,7 @@ function closeApprovePage() {
   showApprovePage.value = false;
   appointmentResult.value = null;
   // Если ИИН очищен (автоматическое перенаправление), закрываем модалку расписания
-  if (!userStore.iin) {
+  if (!userStore.iin || userStore.iin.length !== 12) {
     visible.value = false;
     doctor.value = null;
     isPaidService.value = false;

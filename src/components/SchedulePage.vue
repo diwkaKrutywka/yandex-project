@@ -458,13 +458,13 @@ async function confirmAppointment() {
   
   // Для платных услуг нужен выбранный врач
   if (props.isPaidService && !selectedDoctorForPaid.value) {
-    alert('Пожалуйста, выберите врача');
+    console.warn('Пожалуйста, выберите врача');
     return;
   }
   
   // Для ОСМС нужен доктор
   if (!props.isPaidService && !props.doctor) {
-    alert('Ошибка: не выбран доктор');
+    console.error('Ошибка: не выбран доктор');
     return;
   }
   

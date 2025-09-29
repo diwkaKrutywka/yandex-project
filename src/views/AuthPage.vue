@@ -33,12 +33,21 @@
         </p>
 
         <!-- Поле для ИИН -->
-        <input
-          v-model="iin"
-          type="text"
-          class="w-full text-center text-base sm:text-lg rounded-2xl py-3 mb-4 bg-[#E0E0E0] font-bold text-black"
-          readonly
-        />
+        <div class="w-full mb-4">
+          <input
+            v-model="iin"
+            type="text"
+            :class="[
+              'w-full text-center text-base sm:text-lg rounded-2xl py-3 font-bold text-black',
+              iinError ? 'bg-red-100 border-2 border-red-400' : 'bg-[#E0E0E0]'
+            ]"
+            readonly
+          />
+          <!-- Сообщение об ошибке -->
+          <div v-if="iinError" class="text-red-500 text-sm mt-2 text-center">
+            {{ iinError }}
+          </div>
+        </div>
 
         <!-- Клавиатура -->
         <div class="grid grid-cols-3 gap-3 w-full mb-4 mt-6">
@@ -120,26 +129,50 @@ onMounted(() => {
 const userStore = useUserStore();
 
 const iin = ref("");
+const iinError = ref("");
 const numbers = ["1", "2", "3", "4", "5", "6", "7", "8", "9"];
 
 const addDigit = (digit: string) => {
   if (iin.value.length < 12) {
     iin.value += digit;
+    // Очищаем ошибку при вводе
+    if (iinError.value) {
+      iinError.value = "";
+    }
   }
 };
 
 const backspace = () => {
   iin.value = iin.value.slice(0, -1);
+  // Очищаем ошибку при удалении
+  if (iinError.value) {
+    iinError.value = "";
+  }
+};
+
+const validateIin = () => {
+  if (iin.value.length === 0) {
+    iinError.value = "Введите ИИН";
+    return false;
+  } else if (iin.value.length < 12) {
+    iinError.value = "ИИН должен содержать 12 цифр";
+    return false;
+  } else if (iin.value.length > 12) {
+    iinError.value = "ИИН не должен содержать более 12 цифр";
+    return false;
+  } else if (!/^\d{12}$/.test(iin.value)) {
+    iinError.value = "ИИН должен содержать только цифры";
+    return false;
+  }
+  return true;
 };
 
 const authorize = () => {
-  if (iin.value.length === 12) {
+  if (validateIin()) {
     userStore.setIin(iin.value);
-    alert(`${$t('auth_success')} ${iin.value}`);
-    router.back()
-    // здесь можно сделать router.push('/home') например
-  } else {
-    alert($t('auth_error'));
+    console.log(`${$t('auth_success')} ${iin.value}`);
+    router.back();
   }
+  // Если валидация не прошла, ошибка уже показана в validateIin()
 };
 </script>

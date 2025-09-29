@@ -1,9 +1,44 @@
 <template>
-  <div class="flex flex-col h-full">
+  <div class="flex flex-col h-full rounded-2xl">
     <!-- Основной контент -->
     <div class="flex flex-col items-center justify-center text-center p-10 flex-1">
       <!-- Иконка -->
       <div class="mb-6">
+         <!-- Круговой таймер -->
+    <div class="flex justify-center mb-8">
+      <div class="relative w-10 h-10">
+        <svg class="w-10 h-10 transform -rotate-90" viewBox="0 0 40 40">
+          <!-- Фоновый круг -->
+          <circle
+            cx="20"
+            cy="20"
+            r="18"
+            stroke="#E5E7EB"
+            stroke-width="3"
+            fill="none"
+          />
+          <!-- Прогресс круг -->
+          <circle
+            cx="20"
+            cy="20"
+            r="18"
+            stroke="#11AE78"
+            stroke-width="3"
+            fill="none"
+            :stroke-dasharray="circumference"
+            :stroke-dashoffset="strokeDashoffset"
+            stroke-linecap="round"
+            class="transition-all duration-1000 ease-linear"
+          />
+        </svg>
+        <!-- Текст таймера в центре -->
+        <div class="absolute inset-0 flex items-center justify-center">
+          <span class="text-sm font-bold text-[#11AE78]">{{ timeLeft }}</span>
+        </div>
+      </div>
+    </div>
+
+
         <img
           src="../assets/clinic.svg"
           alt="clinic"
@@ -21,12 +56,7 @@
       </div>
     </div>
 
-    <!-- Таймер -->
-    <div class="flex justify-center mb-4">
-      <div class="timer-circle">
-        <div class="timer-progress" :style="{ '--progress': ((10 - timeLeft) / 10) * 100 + '%' }"></div>
-      </div>
-    </div>
+   
 
     <!-- Фиксированный футер -->
     <div class="flex justify-center bg-[#E8F4F2] mt-6">
@@ -41,7 +71,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted } from 'vue';
+import { ref, computed, onMounted, onUnmounted } from 'vue';
 import { useRouter } from 'vue-router';
 import { useUserStore } from '../store/index';
 
@@ -60,7 +90,15 @@ const userStore = useUserStore();
 
 // Таймер
 const timeLeft = ref(10);
+const totalTime = 10;
 let timer: number | null = null;
+
+// Вычисляемые свойства для кругового прогресса
+const circumference = computed(() => 2 * Math.PI * 18) // радиус 18
+const strokeDashoffset = computed(() => {
+  const progress = (totalTime - timeLeft.value) / totalTime
+  return circumference.value * (1 - progress)
+})
 
 // Отладочные логи
 console.log("🔍 ApprovePage: получен appointmentResult:", props.appointmentResult);
@@ -85,7 +123,7 @@ const startTimer = () => {
       if (timer) {
         clearInterval(timer);
       }
-      router.push('/main-view');
+      router.push('/');
     }
   }, 1000);
 };
@@ -102,46 +140,5 @@ onUnmounted(() => {
 </script>
 
 <style scoped>
-.timer-circle {
-  width: 60px;
-  height: 60px;
-  border-radius: 50%;
-  background: #E8F4F2;
-  border: 3px solid #11AE78;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  position: relative;
-  overflow: hidden;
-}
-
-.timer-progress {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: conic-gradient(from 0deg, #11AE78 0deg, #11AE78 calc(360deg - var(--progress) * 3.6deg), transparent calc(360deg - var(--progress) * 3.6deg));
-  border-radius: 50%;
-  transition: background 0.1s ease;
-}
-
-@keyframes pulse {
-  0%, 100% {
-    transform: scale(1);
-    box-shadow: 0 4px 15px rgba(17, 174, 120, 0.3);
-  }
-  50% {
-    transform: scale(1.05);
-    box-shadow: 0 6px 20px rgba(17, 174, 120, 0.4);
-  }
-}
-
-/* Адаптивность для мобильных */
-@media (max-width: 640px) {
-  .timer-circle {
-    width: 50px;
-    height: 50px;
-  }
-}
+/* Стили для кругового таймера уже встроены в template */
 </style>

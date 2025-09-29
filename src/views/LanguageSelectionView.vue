@@ -37,7 +37,7 @@
 
       <!-- Кнопки выбора языка -->
       <div class="font-semibold mb-3 sm:mb-4 text-xs sm:text-sm lg:text-base flex items-center"> 
-        {{ $t('select_language') }}
+      Тілді таңдаңыз  |  Выберите язык
       </div>
       <div class="flex  sm:flex-row gap-4 sm:gap-6">
        
