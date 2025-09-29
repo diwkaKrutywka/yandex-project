@@ -74,8 +74,8 @@ import { useI18n } from "vue-i18n";
 
 const { currentDate, currentTime } = useDateTime();
 // const router = useRouter();
-const { t: $t } = useI18n();
-  import { ref } from "vue";
+const { t: $t, locale } = useI18n();
+  import { ref, computed } from "vue";
   // Данные услуг
   // const services = [
   //   { id: 'general', name: 'Общие услуги' },
@@ -92,39 +92,77 @@ const { t: $t } = useI18n();
 
 const activeKey = ref<number | string>("1");
 
-const faqList: FaqItem[] = [
-  {
-    id: 1,
-    question: "Какие услуги доступны в поликлинике?",
-    answer: [
+// Многоязычные ответы для FAQ
+const answers = {
+  ru: {
+    available_services: [
       "Приём врачей-специалистов (терапевт, педиатр, хирург и др.)",
-      "Запись на диагностику и анализы",
+      "Запись на диагностику и анализы", 
       "Получение справок и медицинских документов",
       "Платные услуги (консультации, обследования, процедуры)",
       "Проверка и обновление данных прикрепления"
-    ]
+    ],
+    how_to_attach: ["При наличии ЭЦП прикрепиться к поликлинике можно на портале электронного правительства www.e.gov.kz. Для этого в разделе «здравоохранение» необходимо выбрать услугу «Прикрепление к медицинской организации, оказывающей первичную медико-санитарную помощь». Как только все поля будут заполнены, информация о пациенте автоматически поступит в поликлинику. Если все манипуляции были проделаны верны, обратившемуся придет уведомление о прикреплении, подтверждённое электронно-цифровой подписью медицинского учреждения."],
+    call_doctor_home: ["Вызвать врача на дом можно позвонив в регистратуру, а также при подаче электронной заявки на получение государственной услуги «Вызов врача на дом» через портал электронного правительства www.egov.kz при наличии электронной цифровой подписи, либо через мобильное приложение «Damumed»."],
+    get_tests_referral: ["Чтобы получить направление на анализы в поликлинике по месту жительства (по ОМС или ОСМС в Казахстане), вам необходимо записаться на прием к врачу (терапевту или узкому специалисту). Во время приема врач оценит состояние вашего здоровья и, при необходимости, выпишет направление на нужные анализы. Затем вы сможете пройти обследование в поликлинике или в лаборатории, заключившей договор с вашей поликлиникой."],
+    screening_research: ["Скрининг в поликлинике — это профилактический медицинский осмотр здоровых людей определённого возраста, направленный на выявление заболеваний (особенно онкологических, сердечно-сосудистых, диабета) и факторов риска на ранней стадии, когда они еще не проявляют себя симптомами. Такие обследования проводятся в рамках Гарантированного объема бесплатной медицинской помощи, позволяют подобрать своевременное лечение и профилактические меры, а также формируют и укрепляют здоровье населения"]
+  },
+  kk: {
+    available_services: [
+      "Маман дәрігерлердің қабылдауы (терапевт, педиатр, хирург және т.б.)",
+      "Диагностика және талдауға жазылу", 
+      "Анықтамалар мен медициналық құжаттарды алу",
+      "Ақылы қызметтер (консультациялар, тексерулер, процедуралар)",
+      "Тіркелу деректерін тексеру және жаңарту"
+    ],
+    how_to_attach: ["ЭЦП болған жағдайда поликлиникаға тіркелу электрондық үкімет порталы www.e.gov.kz арқылы мүмкін. Ол үшін «денсаулық сақтау» бөлімінде «Бірінші медицина-санитарлық көмек көрсететін медициналық ұйымға тіркелу» қызметін таңдау керек. Барлық өрістер толтырылғаннан кейін, науқас туралы ақпарат автоматты түрде поликлиникаға жіберіледі. Егер барлық әрекеттер дұрыс орындалса, тіркелген адамға медициналық мекеменің электронды-цифрлық қолтаңбасымен расталған тіркелу туралы хабарлама келеді."],
+    call_doctor_home: ["Дәрігерді үйге шақыру үшін тіркеу бөліміне телефон соғып, сондай-ақ электрондық үкімет порталы www.egov.kz арқылы «Дәрігерді үйге шақыру» мемлекеттік қызметін алуға электрондық заявка беруге болады, электрондық цифрлық қолтаңба болған жағдайда, немесе «Damumed» мобильді қосымшасы арқылы."],
+    get_tests_referral: ["Тұрған жері бойынша поликлиникада (Қазақстанда ОМС немесе ОСМС бойынша) талдауға бағыттама алу үшін дәрігерге (терапевтке немесе тар маманға) қабылдауға жазылу керек. Қабылдау кезінде дәрігер сіздің денсаулық жағдайыңызды бағалап, қажет болса, қажетті талдауларға бағыттама жазады. Содан кейін сіз поликлиникада немесе поликлиникамен келісімшарт жасасқан зертханада тексерулерден өте аласыз."],
+    screening_research: ["Поликлиникадағы скрининг - бұл белгілі бір жастағы дені сау адамдардың профилактикалық медициналық тексерісі, ауруларды (әсіресе онкологиялық, жүрек-қан тамыр, диабет) және қауіп факторларын ерте кезеңде, олар әлі симптомдармен көрінбейтін кезде анықтауға бағытталған. Мұндай тексерулер Кепілдік берілген медициналық көмек көлемі шеңберінде жүргізіледі, уақтылы емдеу және профилактикалық шараларды таңдауға мүмкіндік береді, сондай-ақ халықтың денсаулығын қалыптастыру және нығайтуға ықпал етеді"]
+  },
+  en: {
+    available_services: [
+      "Specialist doctor consultations (therapist, pediatrician, surgeon, etc.)",
+      "Registration for diagnostics and tests", 
+      "Obtaining certificates and medical documents",
+      "Paid services (consultations, examinations, procedures)",
+      "Checking and updating attachment data"
+    ],
+    how_to_attach: ["With an EDS, you can attach to a polyclinic through the e-government portal www.e.gov.kz. To do this, in the 'healthcare' section, you need to select the service 'Attachment to a medical organization providing primary health care'. As soon as all fields are filled in, information about the patient will automatically be sent to the polyclinic. If all manipulations were performed correctly, the applicant will receive a notification about the attachment, confirmed by the electronic digital signature of the medical institution."],
+    call_doctor_home: ["You can call a doctor to your home by calling the registry, as well as by submitting an electronic application for the state service 'Call a doctor to your home' through the e-government portal www.egov.kz if you have an electronic digital signature, or through the mobile application 'Damumed'."],
+    get_tests_referral: ["To get a referral for tests at a polyclinic at your place of residence (under CHI or CHI in Kazakhstan), you need to make an appointment with a doctor (therapist or narrow specialist). During the appointment, the doctor will assess your health condition and, if necessary, write a referral for the necessary tests. Then you can undergo an examination at a polyclinic or in a laboratory that has entered into an agreement with your polyclinic."],
+    screening_research: ["Screening in a polyclinic is a preventive medical examination of healthy people of a certain age, aimed at identifying diseases (especially oncological, cardiovascular, diabetes) and risk factors at an early stage, when they do not yet manifest themselves with symptoms. Such examinations are carried out within the framework of the Guaranteed volume of free medical care, allow you to choose timely treatment and preventive measures, and also form and strengthen the health of the population"]
+  }
+};
+
+// Реактивный FAQ список
+const faqList = computed(() => [
+  {
+    id: 1,
+    question: $t('faq_questions.available_services'),
+    answer: answers[locale.value as keyof typeof answers]?.available_services || answers.ru.available_services
   },
   {
     id: 2,
-    question: "Как прикрепиться к поликлинике?",
-    answer: ["При наличии ЭЦП прикрепиться к поликлинике можно на портале электронного правительства www.e.gov.kz. Для этого в разделе «здравоохранение» необходимо выбрать услугу «Прикрепление к медицинской организации, оказывающей первичную медико-санитарную помощь». Как только все поля будут заполнены, информация о пациенте автоматически поступит в поликлинику. Если все манипуляции были проделаны верны, обратившемуся придет уведомление о прикреплении, подтверждённое электронно-цифровой подписью медицинского учреждения."]
+    question: $t('faq_questions.how_to_attach'),
+    answer: answers[locale.value as keyof typeof answers]?.how_to_attach || answers.ru.how_to_attach
   },
   {
     id: 3,
-    question: "Как вызвать врача на дом?",
-    answer: ["Вызвать врача на дом можно позвонив в регистратуру, а также при подаче электронной заявки на получение государственной услуги «Вызов врача на дом» через портал электронного правительства www.egov.kz при наличии электронной цифровой подписи, либо через мобильное приложение «Damumed»."]
+    question: $t('faq_questions.call_doctor_home'),
+    answer: answers[locale.value as keyof typeof answers]?.call_doctor_home || answers.ru.call_doctor_home
   },
   {
     id: 4,
-    question: "Как получить направление на анализы?",
-    answer: ["Чтобы получить направление на анализы в поликлинике по месту жительства (по ОМС или ОСМС в Казахстане), вам необходимо записаться на прием к врачу (терапевту или узкому специалисту). Во время приема врач оценит состояние вашего здоровья и, при необходимости, выпишет направление на нужные анализы. Затем вы сможете пройти обследование в поликлинике или в лаборатории, заключившей договор с вашей поликлиникой. "]
+    question: $t('faq_questions.get_tests_referral'),
+    answer: answers[locale.value as keyof typeof answers]?.get_tests_referral || answers.ru.get_tests_referral
   },
   {
     id: 5,
-    question: "Что такое скрининговое исследование?",
-    answer: ["Скрининг в поликлинике — это профилактический медицинский осмотр здоровых людей определённого возраста, направленный на выявление заболеваний (особенно онкологических, сердечно-сосудистых, диабета) и факторов риска на ранней стадии, когда они еще не проявляют себя симптомами. Такие обследования проводятся в рамках Гарантированного объема бесплатной медицинской помощи, позволяют подобрать своевременное лечение и профилактические меры, а также формируют и укрепляют здоровье населения"]
+    question: $t('faq_questions.screening_research'),
+    answer: answers[locale.value as keyof typeof answers]?.screening_research || answers.ru.screening_research
   }
-];
+]);
   // Функции навигации
   // const selectService = (serviceId: string) => {
   //   console.log(`Выбрана услуга: ${serviceId}`);

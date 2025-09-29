@@ -39,12 +39,13 @@
       <CheckIin />
       <div class="flex-1 bg-[#E8F4F2] flex flex-col mt-2 rounded-t-xl">
         <div class="text-black font-bold text-xl my-4">
-          {{ isSearchMode ? `Результаты поиска: "${searchQuery}"` : (doctors[0]?.specialty || 'Врачи') }}
+          {{ isSearchMode ? `${$t('search')} ${$t('results')}: "${searchQuery}"` : (doctors[0]?.specialty || $t('doctors')) }}
         </div>
         
        
 
         <!-- Таб меню -->
+<<<<<<< HEAD
         <a-tabs v-model:activeKey="activeTab" class="custom-tabs bg-white p-3 rounded shadow mt-4 flex-1">
           <!-- ОСМС -->
           <a-tab-pane key="osms" tab=" Услуга по ОСМС ">
@@ -71,39 +72,132 @@
                     <span>пн. ср, пт 14:00-20:00 вт,<br/> чт 8:00-14:00</span>
                     <div class="border-2 border-[#11AE78] rounded-full px-4 py-2 text-[#11AE78] font-bold w-fit cursor-pointer" @click="openScheduleModal(record)">
                       Записаться
-                    </div>
-                  </div>
-                </template>
-              </template>
-              </a-table>
-            </div>
-          </a-tab-pane>
+=======
+        <div class="bg-white rounded shadow mt-4 flex-1 flex flex-col">
+          <!-- Табы -->
+          <div class="flex border-b">
+            <button 
+              @click="activeTab = 'osms'"
+              :class="[
+                'flex-1 py-4 px-6 text-center font-semibold transition-colors rounded-tl-lg rounded-tr-lg',
+                activeTab === 'osms' 
+                  ? 'bg-[#11AE78] text-white' 
+                  : 'bg-[#0E9A6A] text-white hover:bg-[#11AE78]'
+              ]"
+            >
+              {{ $t('osms_service_tab') }}
+            </button>
+            <button 
+              @click="activeTab = 'paid'"
+              :class="[
+                'flex-1 py-4 px-6 text-center font-semibold transition-colors rounded-tl-lg rounded-tr-lg',
+                activeTab === 'paid' 
+                  ? 'bg-[#11AE78] text-white' 
+                  : 'bg-[#0E9A6A] text-white hover:bg-[#11AE78]'
+              ]"
+            >
+              {{ $t('paid_service_tab') }}
+            </button>
+          </div>
 
-          <!-- Платная услуга -->
-          <a-tab-pane key="paid" tab="Платная услуга">
-            <div class="table-container">
-              <a-table
-                :columns="columnsPaid"
-                :data-source="paidDoctors"
-                row-key="id"
-                bordered
-                :pagination="false"
-                :rowClassName="rowClassName"
-              >
-              <template #bodyCell="{ column, record }">
-                <template v-if="column.key === 'action'">
-                  <div class="flex items-center">
-                    <div  class="border-2 border-[#11AE78] rounded-full px-4 py-2 text-[#11AE78] font-bold w-fit cursor-pointer" @click="openScheduleModalForPaid(record)">
-                      Записаться
+          <!-- Контент табов -->
+          <div class="flex-1 p-4">
+            <!-- ОСМС таб -->
+            <div v-if="activeTab === 'osms'" class="h-full flex flex-col">
+              <div class="bg-[#f9f9f9] rounded-lg overflow-hidden flex-1 flex flex-col">
+                <!-- Заголовки таблицы -->
+                <div class="bg-[#E8F4F2] px-4 py-3 grid grid-cols-4 gap-4 text-sm font-semibold text-[#11AE78]">
+                  <div>{{ $t('doctors_table_headers.full_name') }}</div>
+                  <div>{{ $t('doctors_table_headers.specialty') }}</div>
+                  <div>{{ $t('doctors_table_headers.cabinet') }}</div>
+                  <div>{{ $t('doctors_table_headers.working_hours') }}</div>
+                </div>
+                
+                <!-- Данные таблицы -->
+                <div class="table-scroll">
+                  <div 
+                    v-for="(doctor, index) in (isSearchMode ? searchResults : doctors)" 
+                    :key="isSearchMode ? doctor.doctor_id : (doctor as any).id"
+                    :class="[
+                      'px-4 py-4 grid grid-cols-4 gap-4 text-sm border-b border-[#e0e0e0] hover:bg-[#f0f0f0]',
+                      index % 2 === 0 ? 'bg-white' : 'bg-[#E8F4F2]'
+                    ]"
+                  >
+                    <div class="font-medium text-[#333333]">{{ doctor.full_name }}</div>
+                    <div class="text-[#666666]">{{ doctor.specialty }}</div>
+                    <div class="text-[#666666]">{{ doctor.cabinet }}</div>
+                    <div class="flex flex-col">
+                      <div class="text-[#666666]">
+                        <div v-if="doctor.schedule_string" class="space-y-1">
+                          <div v-for="(schedule, idx) in doctor.schedule_string.split(';')" :key="idx" class="text-xs">
+                        {{ schedule.trim() }}
+                      </div>
                     </div>
-                    <div  class="ml-2 custom-green-btn rounded-full w-8 h-8 flex items-center justify-center text-white cursor-pointer" @click="openDescriptionModal(record)">?</div>
+>>>>>>> ba214e81d58755787c177c086352a6adbab028bf
+                    </div>
+                      <div class="mt-2">
+                        <button 
+                          @click="openScheduleModal(doctor)"
+                          class="book-appointment-btn border-2 border-[#11AE78] rounded-full px-4 py-2 text-[#11AE78] font-bold text-sm hover:bg-[#11AE78] hover:text-white transition-colors"
+                          style="border: 2px solid #11AE78 !important; color: #11AE78 !important; background-color: transparent !important;"
+                        >
+                          {{ $t('book_appointment') }}
+                        </button>
                   </div>
-                </template>
-              </template>
-              </a-table>
             </div>
-          </a-tab-pane>
-        </a-tabs>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Платная услуга таб -->
+            <div v-if="activeTab === 'paid'" class="h-full flex flex-col">
+              <div class="bg-[#f9f9f9] rounded-lg overflow-hidden flex-1 flex flex-col">
+                <!-- Заголовки таблицы -->
+                <div class="bg-[#E8F4F2] px-4 py-3 grid grid-cols-5 gap-4 text-sm font-semibold text-[#11AE78]">
+                  <div>{{ $t('doctors_table_headers.service_name') }}</div>
+                  <div>{{ $t('doctors_table_headers.service_type') }}</div>
+                  <div>{{ $t('doctors_table_headers.first_visit_price') }}</div>
+                  <div>{{ $t('doctors_table_headers.follow_up_price') }}</div>
+                  <div></div>
+                </div>
+                
+                <!-- Данные таблицы -->
+                <div class="table-scroll">
+                  <div 
+                    v-for="(service, index) in paidDoctors" 
+                    :key="service.id"
+                    :class="[
+                      'px-4 py-4 grid grid-cols-5 gap-4 text-sm border-b border-[#e0e0e0] hover:bg-[#f0f0f0]',
+                      index % 2 === 0 ? 'bg-white' : 'bg-[#E8F4F2]'
+                    ]"
+                  >
+                    <div class="font-medium text-[#333333]">{{ service.full_name }}</div>
+                    <div class="text-[#666666]">{{ service.specialty }}</div>
+                    <div class="text-[#666666]">{{ service.first_price }} ₸</div>
+                    <div class="text-[#666666]">{{ service.next_price }} ₸</div>
+                    <div class="flex items-center justify-end">
+                      <button 
+                        @click="openScheduleModalForPaid(service)"
+                        class="border-2 border-[#11AE78] px-6 py-2 text-[#11AE78] font-bold text-sm hover:bg-[#11AE78] hover:text-white transition-colors"
+                        style="border: 2px solid #11AE78 !important; color: #11AE78 !important; background-color: transparent !important; margin-right: 20px !important; border-radius: 20px !important;"
+                      >
+                        {{ $t('book_appointment') }}
+                      </button>
+                      <button 
+                        @click="openDescriptionModal(service)"
+                        class="bg-[#11AE78] w-10 h-10 flex items-center justify-center text-white text-sm hover:bg-[#0E9A6A] transition-colors"
+                        style="background-color: #11AE78 !important; color: white !important; border-radius: 20px !important;"
+                      >
+                        ?
+                      </button>
+                    </div>
+                  </div>
+            </div>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </main>
 
@@ -160,13 +254,13 @@
 
         <!-- Описание услуги -->
         <div class="description-section">
-          <h3 class="section-title">Описание услуги</h3>
+          <h3 class="section-title">{{ $t('service_description') }}</h3>
           <p class="section-text">{{ selectedService.description }}</p>
         </div>
 
         <!-- Для чего нужна -->
         <div class="description-section">
-          <h3 class="section-title">Для чего нужна</h3>
+          <h3 class="section-title">{{ $t('why_needed') }}</h3>
           <ul class="section-list">
             <li v-for="item in selectedService.why_needed" :key="item" class="list-item">
               {{ item }}
@@ -176,7 +270,7 @@
 
         <!-- Что входит в услугу -->
         <div class="description-section">
-          <h3 class="section-title">Что входит в услугу</h3>
+          <h3 class="section-title">{{ $t('what_included') }}</h3>
           <ul class="section-list">
             <li v-for="item in selectedService.what_included" :key="item" class="list-item">
               {{ item }}
@@ -186,13 +280,13 @@
 
         <!-- Длительность -->
         <div class="duration-info">
-          <span class="duration-text">Длительность приема: {{ selectedService.duration }}</span>
+          <span class="duration-text">{{ $t('duration') }} {{ selectedService.duration }}</span>
         </div>
 
         <!-- Кнопка закрытия -->
         <div class="description-footer">
           <button @click="closeDescriptionModal" class="close-button">
-            Закрыть
+            {{ $t('close') }}
           </button>
         </div>
       </div>
@@ -201,7 +295,7 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, onMounted } from "vue";
+import { ref, onMounted, computed } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { useDateTime } from "../composables/useDateTime";
 import { DoctorsApi, type Doctor } from "../api/doctors";
@@ -211,11 +305,13 @@ import CheckIin from "./CheckIin.vue";
 import SchedulePage from "../components/SchedulePage.vue";
 import ApprovePage from "../components/ApprovePage.vue";
 import { useUserStore } from "../store/index";
+import { useI18n } from "vue-i18n";
 const route = useRoute();
 const router = useRouter();
 const { currentDate, currentTime } = useDateTime();
 const userStore = useUserStore();
-const isLoading = ref(false);
+const { t, locale } = useI18n();
+// const isLoading = ref(false); // Удалено - больше не используется
 const error = ref<string | null>(null);
 const doctors = ref<Doctor[]>([]);
 const activeTab = ref<"osms" | "paid">("osms");
@@ -230,7 +326,7 @@ const searchQuery = ref<string | null>(
 const searchResults = ref<SearchDoctor[]>([]);
 const isSearchMode = ref(false);
 
-const loading = ref(false);
+// const loading = ref(false); // Удалено - больше не используется
 const visible = ref(false);
 const doctor = ref<Doctor | null>(null);
 const showApprovePage = ref(false);
@@ -239,42 +335,14 @@ const showDescriptionModal = ref(false);
 const selectedService = ref<any>(null);
 const isPaidService = ref(false);
 const selectedPaidService = ref<any>(null);
-// Колонки для ОСМС
-const columnsOSMS = [
-  { title: "ФИО врача", dataIndex: "full_name", key: "full_name", width: "20%" },
-  { title: "Специальность", dataIndex: "specialty", key: "specialty" , width: "20%" },
-  { title: "Кабинет", dataIndex: "cabinet", key: "cabinet" , width: "20%" },
-  { title: "Часы работы", key: "action" },
-];
+// Удалены колонки Ant Design - теперь используем кастомные таблицы
 
-// Колонки для результатов поиска (адаптированные под формат ОСМС)
-const columnsSearchOSMS = [
-  { title: "ФИО врача", dataIndex: "full_name", key: "full_name", width: "20%" },
-  { title: "Специальность", dataIndex: "specialty", key: "specialty" , width: "20%" },
-  { title: "Клиника", dataIndex: "clinic_name", key: "clinic_name" , width: "20%" },
-  { title: "Кабинет", dataIndex: "cabinet", key: "cabinet" , width: "20%" },
-  { title: "Записаться", key: "action" },
-];
-
-
-// Колонки для платных услуг
-const columnsPaid = [
-  { title: "Название", dataIndex: "full_name", key: "full_name", width: "20%" },
-  { title: "Услуга", dataIndex: "specialty", key: "specialty", width: "20%" },
-  { title: "Стоимость (1-ый приём)", dataIndex: "first_price", key: "first_price", width: "20%" },
-  { title: "Стоимость (последующий)", dataIndex: "next_price", key: "next_price", width: "20%" },
-  { title: "", key: "action" },
-];
-
-// Мок-данные платных услуг
-const paidDoctors = ref([
-  { 
-    id: 201, 
-    full_name: "Хирург", 
-    specialty: "Консультация", 
-    first_price: 8000, 
-    next_price: 6000,
-    description: "Консультация хирурга включает в себя осмотр пациента, сбор анамнеза (жалобы и история болезни), оценку состояния и назначение необходимых обследований. Хирург может дать рекомендации по лечению, назначить дополнительную диагностику или принять решение о необходимости хирургического вмешательства.",
+// Мок-данные платных услуг - используем computed для реактивности
+const paidDoctors = computed(() => {
+  const currentLocale = locale.value || 'ru';
+  
+  const surgeonData = {
+    ru: {
     why_needed: [
       "При болях или травмах мягких тканей, суставов, костей",
       "При подозрении на грыжи, опухоли, воспалительные процессы",
@@ -285,16 +353,25 @@ const paidDoctors = ref([
       "Первичная или повторная консультация хирурга",
       "Консультация по результатам анализов и обследований",
       "Назначение лечения или направление к дополнительным специалистам"
-    ],
-    duration: "20-30 минут"
-  },
-  { 
-    id: 202, 
-    full_name: "Окулист", 
-    specialty: "Консультация", 
-    first_price: 6000, 
-    next_price: 5000,
-    description: "Консультация окулиста включает в себя полное обследование зрения, диагностику заболеваний глаз, проверку остроты зрения и подбор коррекции. Врач может выявить различные патологии глаз и назначить соответствующее лечение.",
+      ]
+    },
+    kk: {
+      why_needed: [
+        "Жұмсақ тіндер, буындар, сүйектер аурулары немесе жарақаттары кезінде",
+        "Грыжалар, ісіктер, қабыну процестерінен күдіктенген кезде", 
+        "Операциядан кейінгі жағдайды және жаралардың жазылуын бағалау үшін",
+        "Операцияны жоспарлау немесе оның қажеттілігі туралы екінші пікір алу үшін"
+      ],
+      what_included: [
+        "Хирургтың бірінші немесе қайталама консультациясы",
+        "Талдау және тексеру нәтижелері бойынша консультация",
+        "Емдеу тағайындау немесе қосымша мамандарға бағыттау"
+      ]
+    }
+  };
+
+  const ophthalmologistData = {
+    ru: {
     why_needed: [
       "При снижении остроты зрения",
       "При болях в глазах, покраснении, слезотечении",
@@ -306,16 +383,26 @@ const paidDoctors = ref([
       "Осмотр глазного дна",
       "Измерение внутриглазного давления",
       "Подбор очков или контактных линз"
-    ],
-    duration: "15-25 минут"
-  },
-  { 
-    id: 203, 
-    full_name: "Кардиолог", 
-    specialty: "Консультация", 
-    first_price: 7000, 
-    next_price: 5500,
-    description: "Консультация кардиолога включает в себя осмотр сердечно-сосудистой системы, анализ жалоб пациента, оценку факторов риска и назначение необходимых обследований для диагностики заболеваний сердца и сосудов.",
+      ]
+    },
+    kk: {
+      why_needed: [
+        "Көру өткірлігі төмендеген кезде",
+        "Көзде ауру, қызару, жас ағу кезінде",
+        "Көруді профилактикалық тексеру үшін", 
+        "Көз кернеуімен байланысты бас аурулары кезінде"
+      ],
+      what_included: [
+        "Көру өткірлігін тексеру",
+        "Көз түбін тексеру",
+        "Көз ішкі қысымын өлшеу",
+        "Көзілдірік немесе контактілі линзаларды таңдау"
+      ]
+    }
+  };
+
+  const cardiologistData = {
+    ru: {
     why_needed: [
       "При болях в области сердца",
       "При одышке, сердцебиении, аритмии",
@@ -327,16 +414,26 @@ const paidDoctors = ref([
       "Анализ ЭКГ и других исследований",
       "Назначение дополнительных обследований",
       "Рекомендации по образу жизни и лечению"
-    ],
-    duration: "25-35 минут"
-  },
-  { 
-    id: 204, 
-    full_name: "Невролог", 
-    specialty: "Консультация", 
-    first_price: 7500, 
-    next_price: 6000,
-    description: "Консультация невролога включает в себя неврологический осмотр, оценку состояния нервной системы, диагностику неврологических заболеваний и назначение соответствующего лечения.",
+      ]
+    },
+    kk: {
+      why_needed: [
+        "Жүрек аймағында ауру кезінде",
+        "Тыныс алу қиындығы, жүрек соғысы, аритмия кезінде",
+        "Артериялық қысым жоғарылаған кезде",
+        "Жүрек-қан тамыр ауруларын профилактикалау үшін"
+      ],
+      what_included: [
+        "Жүректі тексеру және тыңдау",
+        "ЭКГ және басқа зерттеулерді талдау",
+        "Қосымша тексерулерді тағайындау", 
+        "Өмір салты және емдеу бойынша ұсыныстар"
+      ]
+    }
+  };
+
+  const neurologistData = {
+    ru: {
     why_needed: [
       "При головных болях, мигренях",
       "При головокружении, нарушении координации",
@@ -348,15 +445,73 @@ const paidDoctors = ref([
       "Проверка рефлексов и чувствительности",
       "Анализ неврологических симптомов",
       "Назначение лечения и реабилитации"
-    ],
-    duration: "30-40 минут"
-  }
-]);
+      ]
+    },
+    kk: {
+      why_needed: [
+        "Бас аурулары, мигрень кезінде",
+        "Бастың айналуы, координация бұзылуы кезінде",
+        "Арқа, мойын аурулары кезінде",
+        "Ұйқы, жад, назар бұзылулары кезінде"
+      ],
+      what_included: [
+        "Неврологиялық тексеру",
+        "Рефлекстер мен сезімталдықты тексеру",
+        "Неврологиялық симптомдарды талдау",
+        "Емдеу және реабилитация тағайындау"
+      ]
+    }
+  };
 
-// Функция для зебры строк
-function rowClassName(_: any, index: number) {
-  return index % 2 === 0 ? "row-light" : "row-white";
-}
+  return [
+    { 
+      id: 201, 
+      full_name: t('paid_services.surgeon.name'), 
+      specialty: t('paid_services.surgeon.specialty'), 
+      first_price: 8000, 
+      next_price: 6000,
+      description: t('paid_services.surgeon.description'),
+      why_needed: currentLocale === 'kk' ? surgeonData.kk.why_needed : surgeonData.ru.why_needed,
+      what_included: currentLocale === 'kk' ? surgeonData.kk.what_included : surgeonData.ru.what_included,
+      duration: t('paid_services.surgeon.duration')
+    },
+    { 
+      id: 202, 
+      full_name: t('paid_services.ophthalmologist.name'), 
+      specialty: t('paid_services.ophthalmologist.specialty'), 
+      first_price: 6000, 
+      next_price: 5000,
+      description: t('paid_services.ophthalmologist.description'),
+      why_needed: currentLocale === 'kk' ? ophthalmologistData.kk.why_needed : ophthalmologistData.ru.why_needed,
+      what_included: currentLocale === 'kk' ? ophthalmologistData.kk.what_included : ophthalmologistData.ru.what_included,
+      duration: t('paid_services.ophthalmologist.duration')
+    },
+    { 
+      id: 203, 
+      full_name: t('paid_services.cardiologist.name'), 
+      specialty: t('paid_services.cardiologist.specialty'), 
+      first_price: 7000, 
+      next_price: 5500,
+      description: t('paid_services.cardiologist.description'),
+      why_needed: currentLocale === 'kk' ? cardiologistData.kk.why_needed : cardiologistData.ru.why_needed,
+      what_included: currentLocale === 'kk' ? cardiologistData.kk.what_included : cardiologistData.ru.what_included,
+      duration: t('paid_services.cardiologist.duration')
+    },
+    { 
+      id: 204, 
+      full_name: t('paid_services.neurologist.name'), 
+      specialty: t('paid_services.neurologist.specialty'), 
+      first_price: 7500, 
+      next_price: 6000,
+      description: t('paid_services.neurologist.description'),
+      why_needed: currentLocale === 'kk' ? neurologistData.kk.why_needed : neurologistData.ru.why_needed,
+      what_included: currentLocale === 'kk' ? neurologistData.kk.what_included : neurologistData.ru.what_included,
+      duration: t('paid_services.neurologist.duration')
+    }
+  ];
+});
+
+// Удалена функция rowClassName - теперь используем CSS классы напрямую
 
 // Загрузка данных ОСМС
 onMounted(async () => {
@@ -381,7 +536,7 @@ onMounted(async () => {
 });
 async function fetchDoctors() {
   if (!specialityId.value) return;
-  isLoading.value = true;
+  // isLoading.value = true; // Удалено - больше не используется
   error.value = null;
 
   try {
@@ -397,7 +552,7 @@ async function fetchDoctors() {
   } catch (err: any) {
     error.value = err?.response?.data?.message ?? err.message ?? String(err);
   } finally {
-    isLoading.value = false;
+    // isLoading.value = false; // Удалено - больше не используется
   }
 }
 function openScheduleModal(selectedDoctor: Doctor | SearchDoctor) {
@@ -418,7 +573,7 @@ function openScheduleModal(selectedDoctor: Doctor | SearchDoctor) {
       full_name: searchDoctor.full_name,
       specialty: searchDoctor.specialty,
       cabinet: searchDoctor.cabinet,
-      schedule_string: searchDoctor.schedule_string || "По записи",
+      schedule_string: searchDoctor.schedule_string || t('by_appointment'),
       type: 'oms' as const
     };
   } else {
@@ -449,8 +604,8 @@ function openScheduleModalForPaid(service: any) {
     doctor_id: service.id.toString(),
     full_name: service.full_name,
     specialty: service.specialty,
-    cabinet: "Платный кабинет",
-    schedule_string: "По записи",
+    cabinet: t('paid_cabinet'),
+    schedule_string: t('by_appointment'),
     type: "paid"
   };
   visible.value = true;
@@ -493,6 +648,334 @@ function closeDescriptionModal() {
 </script>
 
 <style>
+/* Адаптивные стили для терминала 1440x2560 */
+@media (min-width: 1440px) and (min-height: 2560px) {
+  .bg-white {
+    font-size: 18px;
+  }
+  
+  .grid {
+    gap: 1.5rem;
+  }
+  
+  .px-4 {
+    padding-left: 2rem;
+    padding-right: 2rem;
+  }
+  
+  .py-4 {
+    padding-top: 1.5rem;
+    padding-bottom: 1.5rem;
+  }
+  
+  .text-sm {
+    font-size: 16px;
+  }
+  
+  .text-xs {
+    font-size: 14px;
+  }
+  
+  
+  /* Улучшенная прокрутка */
+  .overflow-y-auto {
+    scrollbar-width: thin;
+    scrollbar-color: #11AE78 #f0f0f0;
+  }
+  
+  .overflow-y-auto::-webkit-scrollbar {
+    width: 8px;
+  }
+  
+  .overflow-y-auto::-webkit-scrollbar-track {
+    background: #f0f0f0;
+    border-radius: 4px;
+  }
+  
+  .overflow-y-auto::-webkit-scrollbar-thumb {
+    background: #11AE78;
+    border-radius: 4px;
+  }
+  
+  .overflow-y-auto::-webkit-scrollbar-thumb:hover {
+    background: #0E9A6A;
+  }
+  
+  
+  .py-3 {
+    padding-top: 1rem;
+    padding-bottom: 1rem;
+  }
+  
+  .px-6 {
+    padding-left: 2rem;
+    padding-right: 2rem;
+  }
+  
+  .py-4 {
+    padding-top: 1.5rem;
+    padding-bottom: 1.5rem;
+  }
+}
+
+/* Стили для кастомных таблиц */
+.grid {
+  display: grid;
+}
+
+.grid-cols-4 {
+  grid-template-columns: repeat(4, 1fr);
+}
+
+.grid-cols-5 {
+  grid-template-columns: repeat(5, 1fr);
+}
+
+/* Явные цвета для предотвращения черных цветов */
+.bg-\[#f5f5f5\] {
+  background-color: #f5f5f5 !important;
+}
+
+.text-\[#666666\] {
+  color: #666666 !important;
+}
+
+.bg-\[#e5e5e5\] {
+  background-color: #e5e5e5 !important;
+}
+
+.text-\[#333333\] {
+  color: #333333 !important;
+}
+
+.bg-\[#f9f9f9\] {
+  background-color: #f9f9f9 !important;
+}
+
+.border-\[#e0e0e0\] {
+  border-color: #e0e0e0 !important;
+}
+
+.hover\:bg-\[#f0f0f0\]:hover {
+  background-color: #f0f0f0 !important;
+}
+
+.hover\:bg-\[#e5e5e5\]:hover {
+  background-color: #e5e5e5 !important;
+}
+
+/* Зеленые цвета для активных элементов */
+.bg-\[#11AE78\] {
+  background-color: #11AE78 !important;
+}
+
+.text-\[#11AE78\] {
+  color: #11AE78 !important;
+}
+
+.border-\[#11AE78\] {
+  border-color: #11AE78 !important;
+}
+
+.hover\:bg-\[#11AE78\]:hover {
+  background-color: #11AE78 !important;
+}
+
+.hover\:text-white:hover {
+  color: white !important;
+}
+
+.bg-\[#0E9A6A\] {
+  background-color: #0E9A6A !important;
+}
+
+.hover\:bg-\[#0E9A6A\]:hover {
+  background-color: #0E9A6A !important;
+}
+
+/* Принудительные стили для кнопок "Записаться" */
+button[class*="border-2"][class*="border-[#11AE78]"] {
+  border: 2px solid #11AE78 !important;
+  color: #11AE78 !important;
+  background-color: transparent !important;
+}
+
+button[class*="border-2"][class*="border-[#11AE78]"]:hover {
+  background-color: #11AE78 !important;
+  color: white !important;
+}
+
+/* Универсальные стили для всех кнопок "Записаться" */
+button:has-text("Записаться"),
+button[class*="book_appointment"],
+button[class*="ml-2"][class*="border-2"] {
+  border: 2px solid #11AE78 !important;
+  color: #11AE78 !important;
+  background-color: transparent !important;
+}
+
+button:has-text("Записаться"):hover,
+button[class*="book_appointment"]:hover,
+button[class*="ml-2"][class*="border-2"]:hover {
+  background-color: #11AE78 !important;
+  color: white !important;
+}
+
+/* Стили для кнопок "?" */
+button[class*="bg-[#11AE78]"] {
+  background-color: #11AE78 !important;
+  color: white !important;
+}
+
+button[class*="bg-[#11AE78]"]:hover {
+  background-color: #0E9A6A !important;
+}
+
+/* Hover эффекты для кнопок */
+button[class*="border-2"][class*="border-[#11AE78]"]:hover {
+  background-color: #11AE78 !important;
+  color: white !important;
+}
+
+/* Принудительные стили для всех кнопок с зеленой рамкой */
+button[style*="border: 2px solid #11AE78"]:hover {
+  background-color: #11AE78 !important;
+  color: white !important;
+}
+
+button[style*="background-color: #11AE78"]:hover {
+  background-color: #0E9A6A !important;
+}
+
+/* Стили для кнопок */
+button {
+  transition: all 0.3s ease;
+}
+
+/* Максимально специфичные стили для кнопок "Записаться" */
+div[class*="flex items-center justify-between"] button,
+div[class*="flex items-center justify-end"] button[class*="border-2"] {
+  border: 2px solid #11AE78 !important;
+  color: #11AE78 !important;
+  background-color: transparent !important;
+}
+
+div[class*="flex items-center justify-between"] button:hover,
+div[class*="flex items-center justify-end"] button[class*="border-2"]:hover {
+  background-color: #11AE78 !important;
+  color: white !important;
+}
+
+/* Принудительные стили для всех кнопок с текстом "Записаться" */
+button:contains("Записаться") {
+  border: 2px solid #11AE78 !important;
+  color: #11AE78 !important;
+  background-color: transparent !important;
+}
+
+button:contains("Записаться"):hover {
+  background-color: #11AE78 !important;
+  color: white !important;
+}
+
+/* Принудительные стили для табов */
+button[class*="flex-1"][class*="py-4"] {
+  color: white !important;
+}
+
+button[class*="flex-1"][class*="py-4"]:not([class*="bg-[#11AE78]"]) {
+  background-color: #0E9A6A !important;
+}
+
+button[class*="flex-1"][class*="py-4"]:hover {
+  background-color: #11AE78 !important;
+}
+
+/* Скругления для табов */
+button[class*="rounded-tl-lg"] {
+  border-top-left-radius: 0.5rem !important;
+}
+
+button[class*="rounded-tr-lg"] {
+  border-top-right-radius: 0.5rem !important;
+}
+
+/* Скругления для всех углов табов */
+button[class*="flex-1"][class*="py-4"] {
+  border-top-left-radius: 0.5rem !important;
+  border-top-right-radius: 0.5rem !important;
+}
+
+button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Стили для скролла */
+.overflow-y-auto {
+  scrollbar-width: thin;
+  scrollbar-color: #11AE78 #f1f1f1;
+}
+
+.overflow-y-auto::-webkit-scrollbar {
+  width: 8px;
+}
+
+.overflow-y-auto::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 4px;
+}
+
+.overflow-y-auto::-webkit-scrollbar-thumb {
+  background: #11AE78;
+  border-radius: 4px;
+}
+
+.overflow-y-auto::-webkit-scrollbar-thumb:hover {
+  background: #0E9A6A;
+}
+
+/* Фиксированная высота для прокрутки */
+.table-scroll {
+  max-height: 350px !important;
+  min-height: 200px !important;
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
+  scrollbar-gutter: stable;
+}
+
+/* Принудительная прокрутка - одинаковый размер для всех скроллбаров */
+.table-scroll::-webkit-scrollbar {
+  width: 8px !important;
+  height: 8px !important;
+  display: block !important;
+  -webkit-appearance: none;
+}
+
+.table-scroll::-webkit-scrollbar-track {
+  background: #f0f0f0 !important;
+  border-radius: 4px !important;
+}
+
+.table-scroll::-webkit-scrollbar-thumb {
+  background: #11AE78 !important;
+  border-radius: 4px !important;
+}
+
+.table-scroll::-webkit-scrollbar-thumb:hover {
+  background: #0E9A6A !important;
+}
+
+/* Вертикальный скроллбар */
+.table-scroll::-webkit-scrollbar:vertical {
+  width: 8px !important;
+}
+
+/* Горизонтальный скроллбар */
+.table-scroll::-webkit-scrollbar:horizontal {
+  height: 8px !important;
+}
+
 /* Стили для модального окна подтверждения */
 .approve-modal .ant-modal {
   max-width: 500px !important;

@@ -158,7 +158,7 @@ export default {
   make_appointment: "Make an<br/>appointment",
   help_center: "Help<br/>center",
   ask_aigerim: "Ask Aigerim",
-  search_placeholder: "Search...",
+  search_placeholder: "Find doctor/service",
   back_button: "Back",
   home_button: "Home",
   language_kaz: "Kaz",
@@ -180,6 +180,7 @@ export default {
   // AuthPage.vue
   auth_title: "Make an appointment",
   auth_description: "To make an appointment<br/>enter your IIN",
+  iin_placeholder: "Enter IIN",
   authorize_button: "Authorize",
   data_protection: "Your data is protected and used<br/>only for verification in the clinic",
   auth_success: "You are authorized with IIN:",
