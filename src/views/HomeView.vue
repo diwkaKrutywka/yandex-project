@@ -218,14 +218,8 @@ const selectService = (service: string) => {
     }, 100);
   }
   else if (service === "help") {
-    // Скрываем локальное видео и запускаем глобальную анимацию для InfoService
-    isAnimating.value = true;
-    (window as any).startVideoTransition();
-    
-    // Переходим на страницу через небольшую задержку
-    setTimeout(() => {
-      router.push("/info-service");
-    }, 100);
+    // Переходим на страницу справочной информации
+    router.push("/info-service");
   }
 };
 

@@ -9,8 +9,8 @@
       <div class="flex flex-col items-center text-white">
         <span
           class="text-xs sm:text-xs font-semibold mb-1 leading-tight text-center"
+          v-html="$t('qr_button_text')"
         >
-          Подробнее<br />о терминале
         </span>
         <img
           src="../assets/bx_qr.svg"
@@ -28,13 +28,13 @@
       <!-- Левая часть футера -->
       <div class="flex items-center flex-1">
         <!-- Поиск -->
-        <div v-if="props.showSearch" class="flex-1 max-w-md ml-4 my-4">
+        <div v-if="props.showSearch" class="w-52 sm:w-60 lg:w-72 ml-4 my-4">
           <div class="relative">
             <input
               type="text"
               :placeholder="$t('search_placeholder')"
               @click="goToSearch"
-              class="w-full px-3 sm:px-4 py-1.5 sm:py-2 pl-8 sm:pl-10 pr-8 sm:pr-10 text-xs sm:text-sm lg:text-base border-2 border-[#11AE78] bg-white rounded-xl sm:rounded-[14px] focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent cursor-pointer"
+              class="w-full px-3 sm:px-4 py-1.5 sm:py-2 pl-3 sm:pl-4 pr-8 sm:pr-10 text-xs sm:text-sm lg:text-base border-2 border-[#11AE78] bg-white rounded-xl sm:rounded-[14px] focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent cursor-pointer placeholder-gray-500 search-input"
               readonly
             />
             <div
@@ -239,5 +239,47 @@ const handleQRClick = () => {
 .qr-animate {
   animation: pulse 2s infinite, bounce 3s infinite;
   border-radius: 16px 16px 0 0;
+}
+
+/* Стили для placeholder в поле поиска */
+input[readonly]::placeholder {
+  color: #6B7280 !important;
+  opacity: 1 !important;
+  font-weight: normal !important;
+}
+
+input[readonly]:focus::placeholder {
+  color: #9CA3AF !important;
+}
+
+/* Стили для вводимого текста */
+input[readonly] {
+  color: #000000 !important;
+  font-weight: bold !important;
+}
+
+input[readonly]:focus {
+  color: #000000 !important;
+}
+
+/* Специальные стили для поля поиска */
+.search-input {
+  text-indent: 0 !important;
+}
+
+.search-input::placeholder {
+  text-indent: 0 !important;
+  padding-left: 0 !important;
+}
+
+/* Когда есть текст, добавляем отступ */
+.search-input:not(:placeholder-shown) {
+  padding-left: 2rem !important;
+}
+
+@media (min-width: 640px) {
+  .search-input:not(:placeholder-shown) {
+    padding-left: 2.5rem !important;
+  }
 }
 </style>

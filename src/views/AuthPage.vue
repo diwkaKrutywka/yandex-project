@@ -36,7 +36,7 @@
         <input
           v-model="iin"
           type="text"
-          class="w-full text-center text-base sm:text-lg rounded-2xl py-3 mb-4 bg-[#E0E0E0] font-bold text-black"
+          class="w-full text-center text-xl sm:text-2xl rounded-2xl py-4 mb-4 bg-gray-200 font-bold text-black"
           readonly
         />
 
@@ -46,7 +46,7 @@
             v-for="n in numbers"
             :key="n"
             @click="addDigit(n)"
-            class="bg-[#E8F4F2] hover:bg-green-200 py-3 rounded-xl text-lg text-center cursor-pointer"
+            class="bg-[#E8F4F2] hover:bg-green-200 py-3 rounded-xl text-lg text-center cursor-pointer text-black font-bold"
           >
             {{ n }}
           </div>
@@ -59,7 +59,7 @@
           </div>
 
           <div
-            class="bg-[#E8F4F2] hover:bg-green-200 py-3 rounded-xl text-lg text-center cursor-pointer"
+            class="bg-[#E8F4F2] hover:bg-green-200 py-3 rounded-xl text-lg text-center cursor-pointer text-black font-bold"
             @click="addDigit('0')"
           >
             0
@@ -75,7 +75,7 @@
 
         <!-- Кнопка авторизации -->
         <div
-          class="bg-[#0C593E] text-white font-bold my-4 px-20 sm:px-18 py-3 rounded-3xl shadow hover:bg-green-700 text-center cursor-pointer text-sm sm:text-base max-w-md mx-auto"
+          class="bg-[#0C593E] text-white font-bold my-4 px-20 sm:px-18 py-4 rounded-3xl shadow-lg hover:bg-[#0A4A32] text-center cursor-pointer text-base sm:text-lg max-w-md mx-auto transition-all duration-200"
           @click="authorize"
         >
           {{ $t('authorize_button') }}
@@ -143,3 +143,28 @@ const authorize = () => {
   }
 };
 </script>
+
+<style scoped>
+/* Улучшенная видимость для поля ввода ИИН */
+input[type="text"] {
+  color: #000000 !important;
+  font-weight: bold !important;
+  font-size: 1.5rem !important;
+  letter-spacing: 0.1em !important;
+  background-color: #E5E7EB !important;
+  border: none !important;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1) !important;
+}
+
+/* Дополнительные стили для лучшей видимости */
+input:focus {
+  outline: none !important;
+  box-shadow: 0 0 0 3px rgba(17, 174, 120, 0.2) !important;
+}
+
+/* Улучшенная видимость цифр на клавиатуре */
+.grid > div {
+  font-weight: bold !important;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1) !important;
+}
+</style>

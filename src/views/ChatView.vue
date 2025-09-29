@@ -158,7 +158,7 @@
         <input
           v-model="textInput"
           type="text"
-          placeholder="Введите сообщение..."
+          :placeholder="$t('message_placeholder')"
             class="border rounded px-2 sm:px-3 py-1 sm:py-1.5 flex-1 text-xs sm:text-sm hover:bg-gray-100 focus:bg-white transition-colors duration-200"
           @keyup.enter="sendText"
         />

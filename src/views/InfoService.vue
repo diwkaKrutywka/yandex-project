@@ -106,11 +106,11 @@ const isGlobalAnimating = ref(true); // Начинаем со скрытого �
 
 // Данные услуг
 const services = [
-  { id: 'general', name: 'Общие услуги' },
-  { id: 'appointment', name: 'Запись на приём' },
-  { id: 'documents', name: 'Документы и данные' },
-  { id: 'payment', name: 'Оплата и страховка' },
-  { id: 'results', name: 'Результаты и информация' }
+  { id: 'general', name: $t('services_list.general') },
+  { id: 'appointment', name: $t('services_list.appointment') },
+  { id: 'documents', name: $t('services_list.documents') },
+  { id: 'payment', name: $t('services_list.payment') },
+  { id: 'results', name: $t('services_list.results') }
 ];
 
 // Функции навигации
@@ -130,7 +130,7 @@ const selectService = (serviceId: string) => {
     case 'payment':
     case 'results':
       // Показываем демо-сообщение
-      alert(`Информация о разделе "${services.find(s => s.id === serviceId)?.name}" будет доступна в полной версии приложения`);
+      alert($t('service_info_alert', { serviceName: services.find(s => s.id === serviceId)?.name }));
       break;
   }
 };
