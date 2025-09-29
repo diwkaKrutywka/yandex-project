@@ -39,7 +39,7 @@
       <div
         @click="startService"
         class="bg-[#0C593E] hover:bg-[#0A4A33] text-white font-bold py-2 sm:py-3 lg:py-4 px-8 sm:px-14 lg:px-16 xl:px-20 rounded-full mt-4 text-sm sm:text-base lg:text-lg xl:text-xl cursor-pointer transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl">
-        {{ $t('start_button') }}
+     Бастау |  Начать 
       </div>
     </main>
 

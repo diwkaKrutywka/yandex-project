@@ -45,37 +45,9 @@
        
 
         <!-- Таб меню -->
-<<<<<<< HEAD
-        <a-tabs v-model:activeKey="activeTab" class="custom-tabs bg-white p-3 rounded shadow mt-4 flex-1">
-          <!-- ОСМС -->
-          <a-tab-pane key="osms" tab=" Услуга по ОСМС ">
-            <div class="table-container">
-              <a-table
-                :columns="isSearchMode ? columnsSearchOSMS : columnsOSMS"
-                :data-source="isSearchMode ? searchResults : doctors"
-                :loading="loading"
-                :row-key="isSearchMode ? 'doctor_id' : 'id'"
-                bordered
-                :pagination="false"
-                :rowClassName="rowClassName"
-              >
-              <template #bodyCell="{ column, record }">
-                <template v-if="column.key === 'action'">
-                  <div>
-                  
-                    <!-- Для обычных врачей показываем расписание -->
-                    <!-- <div v-if="record.schedule_string" class="schedule-text">
-                      <div v-for="(schedule, index) in record.schedule_string.split(';')" :key="index" class="schedule-item">
-                        {{ schedule.trim() }}
-                      </div>
-                    </div> -->
-                    <span>пн. ср, пт 14:00-20:00 вт,<br/> чт 8:00-14:00</span>
-                    <div class="border-2 border-[#11AE78] rounded-full px-4 py-2 text-[#11AE78] font-bold w-fit cursor-pointer" @click="openScheduleModal(record)">
-                      Записаться
-=======
         <div class="bg-white rounded shadow mt-4 flex-1 flex flex-col">
           <!-- Табы -->
-          <div class="flex border-b">
+          <div class="flex">
             <button 
               @click="activeTab = 'osms'"
               :class="[
@@ -103,7 +75,7 @@
           <!-- Контент табов -->
           <div class="flex-1 p-4">
             <!-- ОСМС таб -->
-            <div v-if="activeTab === 'osms'" class="h-full flex flex-col">
+            <div v-if="activeTab === 'osms'" class="h-full flex flex-col ">
               <div class="bg-[#f9f9f9] rounded-lg overflow-hidden flex-1 flex flex-col">
                 <!-- Заголовки таблицы -->
                 <div class="bg-[#E8F4F2] px-4 py-3 grid grid-cols-4 gap-4 text-sm font-semibold text-[#11AE78]">
@@ -128,23 +100,23 @@
                     <div class="text-[#666666]">{{ doctor.cabinet }}</div>
                     <div class="flex flex-col">
                       <div class="text-[#666666]">
-                        <div v-if="doctor.schedule_string" class="space-y-1">
+                        <!-- <div v-if="doctor.schedule_string" class="space-y-1">
                           <div v-for="(schedule, idx) in doctor.schedule_string.split(';')" :key="idx" class="text-xs">
-                        {{ schedule.trim() }}
+                            {{ schedule.trim() }}
+                          </div>
+                        </div> -->
+                        <span> пн. ср, пт<br/> 14:00-20:00<br/> вт, чт 8:00-14:00</span>
                       </div>
-                    </div>
->>>>>>> ba214e81d58755787c177c086352a6adbab028bf
-                    </div>
                       <div class="mt-2">
-                        <button 
+                        <div 
                           @click="openScheduleModal(doctor)"
-                          class="book-appointment-btn border-2 border-[#11AE78] rounded-full px-4 py-2 text-[#11AE78] font-bold text-sm hover:bg-[#11AE78] hover:text-white transition-colors"
+                          class="book-appointment-btn border-2 border-[#11AE78] rounded-[20px] px-4 py-2 text-[#11AE78] font-bold text-sm hover:bg-[#11AE78] hover:text-white transition-colors"
                           style="border: 2px solid #11AE78 !important; color: #11AE78 !important; background-color: transparent !important;"
                         >
                           {{ $t('book_appointment') }}
-                        </button>
-                  </div>
-            </div>
+                        </div>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -942,6 +914,7 @@ button:hover {
   overflow-y: auto !important;
   overflow-x: hidden !important;
   scrollbar-gutter: stable;
+  
 }
 
 /* Принудительная прокрутка - одинаковый размер для всех скроллбаров */
